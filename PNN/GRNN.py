@@ -52,7 +52,7 @@ def main():
   # array to hold predicted values
   yHat = np.zeros(y.shape[0])
   
-  sigmas = np.arange(.1,3,.1) # values of sigma to test
+  sigmas = np.arange(.001,1,.005) # values of sigma to test
   costs = np.zeros(sigmas.shape[0]) # find costs of using each sigma
   
   # best and worst set of predicted values
@@ -103,3 +103,32 @@ def main():
 # ================================================================================
 main()
 # ================================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
