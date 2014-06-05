@@ -6,7 +6,6 @@ class GRNN:
   def __init__(self):
     self.bestSigma = None
   
-  # find sigma???
   def fit(self, X, y):
     
     # array to hold predicted values
@@ -38,7 +37,7 @@ class GRNN:
 
     # find the numerator and denominator
     for i in range(X.shape[0]):
-      dist = self.SqrWeightedEucludeanDist(X[idx],X[i],sigma)
+      dist = self.SqrWeightedEuclideanDist(X[idx],X[i],sigma)
       num += y[i]*math.exp(-dist)
       denom += math.exp(-dist)
     
@@ -46,7 +45,7 @@ class GRNN:
     return (num/denom)
   
   # calculate weighted euclidean distance
-  def SqrWeightedEucludeanDist(self, x1, x2, sigma):
+  def SqrWeightedEuclideanDist(self, x1, x2, sigma):
     dist = sum(((x1-x2)/sigma)**2)
     return dist
   
