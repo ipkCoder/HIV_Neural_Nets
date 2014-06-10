@@ -10,7 +10,6 @@ import math
 # calculate weighted euclidean distance
 def SqrWeightedEucludeanDist(x1, x2, sigma):
   dist = sum(((x1-x2)/sigma)**2)
-#  print dist
   return dist
 
 # ================================================================================
