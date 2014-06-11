@@ -14,22 +14,32 @@ import math
 
 # ======= Regarding first TODO ===============
 # what do you mean by map input layer to pattern layer?
-# each trainging sample does not get its own sigma values
+# each training sample does not get its own sigma values
+# R: Hi Ian, I'm just trying to understand how data passes from "input" layer(s)
+# to the "pattern" layer(s).  I'm going off the Fig. 3 from the paper.
+# I guess what I'm not completely understanding is how the "sigma" weight(s) vector is applied
+# to the training sample(s) in the "input" layer stage.
 
 # we really dont need to keep track of best and work y-hat
-# i dont remember why i did that, I think just to see if at end best was better
+# I dont remember why i did that, I think just to see if at end best was better
+# R: We can remove these if not needed, I hadn't gotten that far in revising the code
+# so I left those variables as-is since I wan't sure if they were relevant.
 
 # for cost function
 #   - are you wanting to calculate cost of each sample one at a time (through function getE)?
+# R: cost function is not being utilized at this point, but yes the intention is that 
+# we would be using this to identify the error, i.e. cost of misclassifying a
+# training sample instance.
 
 #activation function should include exp(-D)
 #not understanding input layer/input matrix
+# R: this ties in to my attempt to understand how the input layer => pattern layer works.
+# My thinking was that each "pattern" node gets a reference too all the training samples, including
+# the feature / sigma weight pairs.
 
 # outputLayer function only returns one y-hat (for example idx)
 # y should be y[x_i] in function getCosts
 # need to randomly initialize sigmas
-
-
 # ================================================================================
 
 # x1 - x sample vector for which to compute predicted value
@@ -108,16 +118,19 @@ def outputLayer(idx, X, y, sigma):
 
 # y - is y a vector or single value?
 # you convert out to a float twice (reason?)
-
+# R: "y" is meant to be a vector in this context, this code was part of another function previously
+# I just rolled it up into a standalone function. No need for the float
+# good catch.  Note, if you see an obvious mistake, feel free to update the source, that's
+# the idea behind collaborative revision control.  Contributing includes
+# making adding / removing / updating the source.
 def getE(idx, X, y, sigma):
   '''Cost function component'''
   try:
     bX  = outputLayer(idx, X, y, sigma);
     out = float( (bX - y)**2 );
-    e   = float(out);
-    return e;
+    return out;
   except:
-    print "Error getting...error :)";
+    print "Error getting...classification error.";
 # ================================================================================
 
 # could just divide by N at the end instead of in each loop
