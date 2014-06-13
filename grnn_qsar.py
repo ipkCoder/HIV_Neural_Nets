@@ -19,6 +19,8 @@ import math
 # to the "pattern" layer(s).  I'm going off the Fig. 3 from the paper.
 # I guess what I'm not completely understanding is how the "sigma" weight(s) vector is applied
 # to the training sample(s) in the "input" layer stage.
+# Ian: In the input layer, nothing is done to the features, they just enter the network
+# similar to ANN
 
 # we really dont need to keep track of best and work y-hat
 # I dont remember why i did that, I think just to see if at end best was better
@@ -36,6 +38,12 @@ import math
 # R: this ties in to my attempt to understand how the input layer => pattern layer works.
 # My thinking was that each "pattern" node gets a reference too all the training samples, including
 # the feature / sigma weight pairs.
+
+# Ian: all nodes in the pattern layer do not get a reference to all training sample data.
+# Each node in the pattern layer contains the features for one sample (the number of nodes
+# in the patern layer is equal to the number of samples). Each node in the pattern layer computes
+# the squared weighted euclidean distance between the input layer sample and the sample in the node
+# and the activation function value. 
 
 # outputLayer function only returns one y-hat (for example idx)
 # y should be y[x_i] in function getCosts
