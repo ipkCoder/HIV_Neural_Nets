@@ -1,0 +1,108 @@
+(pyDev)Ian-Kanes-MacBook-Pro:Git Work iankane$ python FFN.py
+No fast networks available.
+alpha: 0.0
+Train MSE: 5.14772097402
+Test MSE: 3.68628567603
+alpha: 0.05
+Train MSE: 0.41544290154
+Test MSE: 2.92528520557
+alpha: 0.07
+Train MSE: 0.969521553686
+Test MSE: 0.669786883689
+alpha: 0.085
+Train MSE: 0.258318122604
+Test MSE: 1.04560086448
+alpha: 0.1
+Train MSE: 0.218773794929
+Test MSE: 2.01583910724
+alpha: 0.2
+Train MSE: 1.3933505111
+Test MSE: 2.04357963981
+(pyDev)Ian-Kanes-MacBook-Pro:Git Work iankane$ python FFN.py
+No fast networks available.
+alpha: 0.0
+Train MSE: 10.3129108268
+Test MSE: 6.72718544134
+alpha: 0.05
+Train MSE: 0.270415944378
+Test MSE: 4.59764116991
+alpha: 0.07
+Train MSE: 0.330930480557
+Test MSE: 1.03711283902
+alpha: 0.0775
+Train MSE: 0.306342632448
+Test MSE: 1.02998026372
+alpha: 0.085
+Train MSE: 0.858018743372
+Test MSE: 0.343030963772
+alpha: 0.1
+Train MSE: 0.190604980958
+Test MSE: 1.13457230246
+alpha: 0.2
+Train MSE: 10.7206438535
+Test MSE: 6.21962092922
+(pyDev)Ian-Kanes-MacBook-Pro:Git Work iankane$ python FFN.py
+No fast networks available.
+alpha: 0.0, momentum: 0.05
+Train MSE: 5.84869032918
+Test MSE: 6.56647891695
+alpha: 0.0, momentum: 0.1
+Train MSE: 5.84869032918
+Test MSE: 6.56647891695
+alpha: 0.0, momentum: 0.15
+Train MSE: 5.84869032918
+Test MSE: 6.56647891695
+alpha: 0.05, momentum: 0.05
+Train MSE: 0.364724795378
+Test MSE: 0.761326931941
+alpha: 0.05, momentum: 0.1
+Train MSE: 0.213751957272
+Test MSE: 0.592347664956
+alpha: 0.05, momentum: 0.15
+Train MSE: 0.20334852647
+Test MSE: 0.843100906572
+alpha: 0.07, momentum: 0.05
+Train MSE: 1.21183127039
+Test MSE: 0.553274057765
+alpha: 0.07, momentum: 0.1
+Train MSE: 1.01987793793
+Test MSE: 0.833235722196
+alpha: 0.07, momentum: 0.15
+Train MSE: 0.778256706601
+Test MSE: 0.705109596767
+alpha: 0.0775, momentum: 0.05
+Train MSE: 0.497118914751
+Test MSE: 0.947729958091
+alpha: 0.0775, momentum: 0.1
+Train MSE: 0.258427794796
+Test MSE: 0.917570416006
+alpha: 0.0775, momentum: 0.15
+Train MSE: 0.4070601882
+Test MSE: 1.04472552917
+alpha: 0.085, momentum: 0.05
+Train MSE: 0.250540531291
+Test MSE: 0.571615382887
+alpha: 0.085, momentum: 0.1
+Train MSE: 0.211148267937
+Test MSE: 0.595626593229
+alpha: 0.085, momentum: 0.15
+Train MSE: 0.276459263388
+Test MSE: 0.468567182513
+alpha: 0.1, momentum: 0.05
+Train MSE: 0.316733759544
+Test MSE: 1.2726630728
+alpha: 0.1, momentum: 0.1
+Train MSE: 0.216242259832
+Test MSE: 0.590692673758
+alpha: 0.1, momentum: 0.15
+Train MSE: 0.151609842397
+Test MSE: 0.561675299683
+alpha: 0.2, momentum: 0.05
+Train MSE: 37.4513434127
+Test MSE: 2.46566603792
+alpha: 0.2, momentum: 0.1
+Train MSE: 6.64428954045
+Test MSE: 6.14861365406
+alpha: 0.2, momentum: 0.15
+Train MSE: 6738.56616599
+Test MSE: 1329.18861263
