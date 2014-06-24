@@ -4,6 +4,7 @@ from pybrain.structure import FullConnection
 from pybrain.structure import BiasUnit
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
+from pybrain.tools.validation import Validator
 from numpy import *
 import csv
 
@@ -89,8 +90,6 @@ ffn.randomize()
 
 # print ffn.activate([1, 2])
 
-
-print TrainX
 # print "Input layer weights: {}".format(in_to_hidden.params)
 # print "Hidden layer weights: {}".format(hidden_to_out.params)
 # print "All weights: {}".format(ffn.params)
@@ -109,7 +108,8 @@ for i in range(TrainValX.shape[0]):
 # trainer = BackpropTrainer(ffn, ds, learningrate=.4, momentum=.2)#, verbose=True)
 trainer = BackpropTrainer(ffn, ds)#, learningrate=.4, momentum=.2)#, verbose=True)
 
-alpha = array([.05, .1, .15, .2, .25, .3, 3.5])
+alpha = array([0, .05, .1, .2])#, .15, .2, .25, .3, 3.5])
+
 
 for i in range(alpha.shape[0]):
 	trainer = BackpropTrainer(ffn, ds, learningrate=alpha[i]) 
@@ -124,13 +124,19 @@ for i in range(alpha.shape[0]):
 
 	error = trainer.trainUntilConvergence(maxEpochs=2000, continueEpochs=10)
 
-	print "alpha: {}\n".format(alpha[i])
+	print "alpha: {}".format(alpha[i])
+	
+	train_outputs = zeros(TrainValX.shape[0])
 	for j in range(TrainValX.shape[0]):
-		print ffn.activate(TrainValX[j]), TrainValY[j]
+		train_outputs[j] = ffn.activate(TrainValX[j])
+		# print train_outputs[j], TrainValY[j]
+	print "Train MSE: {}".format(Validator.MSE(train_outputs, TrainValY))
 
-	print "\n"
+	test_outputs = zeros(TestX.shape[0])
 	for j in range(TestX.shape[0]):
-		print ffn.activate(TestX[j]), TestY[j]
+		test_outputs[j] = ffn.activate(TestX[j])
+		# print test_outputs[j], TestY[j]
+	print "Test MSE: {}".format(Validator.MSE(test_outputs, TestY))
 # print ffn.activate(data[0])
 
 
