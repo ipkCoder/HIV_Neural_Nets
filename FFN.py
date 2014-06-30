@@ -65,13 +65,13 @@ ffn = FeedForwardNetwork()
 # create layers
 inLayer = LinearLayer(TrainValX.shape[1], name="input")
 hiddenLayer = SigmoidLayer(20, name="hidden1")
-# hiddenLayer2 = SigmoidLayer(20, name="hidden2")
+hiddenLayer2 = SigmoidLayer(1220, name="hidden2")
 outLayer = LinearLayer(1, name="output")
 
 # add layers to feed forward network
 ffn.addInputModule(inLayer)
 ffn.addModule(hiddenLayer)
-# ffn.addModule(hiddenLayer2)
+ffn.addModule(hiddenLayer2)
 ffn.addOutputModule(outLayer)
 
 # add bias unit to layers
@@ -79,12 +79,12 @@ ffn.addModule(BiasUnit(name='bias'))
 
 # establish connections between layers
 in_to_hidden = FullConnection(inLayer, hiddenLayer)
-# hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
+hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
 hidden_to_out = FullConnection(hiddenLayer, outLayer)
 
 # add connections to network
 ffn.addConnection(in_to_hidden)
-# ffn.addConnection(hidden_to_hidden)
+ffn.addConnection(hidden_to_hidden)
 ffn.addConnection(hidden_to_out)
 
 # necessary, sort layers into correct/certain order
@@ -115,13 +115,25 @@ trainer = BackpropTrainer(ffn, ds)#, learningrate=.4, momentum=.2)#, verbose=Tru
 # most consistent between .07 and .085
 alpha = array([0, .05, .07, .0775, .085, .1, .2])#, .15, .2, .25, .3, 3.5])
 momentum = array([.05, .1, .15])
+
+outcsv = open('results.csv', 'w')
+writer = csv.writer(outcsv)
+
+writer.writerow(['alpha', 'momentum', 'trainMSE', 'testMSE'])
+
+info = zeros(4)
+
 # test learning rates
 for i in range(alpha.shape[0]):
-	
+	info[0] = alpha[i]
+
 	# randomiz weights
 	ffn.randomize()
 
 	for k in range(momentum.shape[0]):
+
+		info[1] = momentum[k]
+
 		# Backprop trainer object
 		trainer = BackpropTrainer(ffn, ds, learningrate=alpha[i], momentum=momentum[k])#, verbose=True)
 
@@ -144,13 +156,18 @@ for i in range(alpha.shape[0]):
 		for j in range(TrainValX.shape[0]):
 			train_outputs[j] = ffn.activate(TrainValX[j])
 			# print train_outputs[j], TrainValY[j]
-		print "Train MSE: {}".format(Validator.MSE(train_outputs, TrainValY))
+		mse = Validator.MSE(train_outputs, TrainValY)
+		info[2] = mse
+		#print "Train MSE: {}".format(mse)
 
 		test_outputs = zeros(TestX.shape[0])
 		for j in range(TestX.shape[0]):
 			test_outputs[j] = ffn.activate(TestX[j])
 			# print test_outputs[j], TestY[j]
-		print "Test MSE: {}".format(Validator.MSE(test_outputs, TestY))
+		mse = Validator.MSE(test_outputs, TestY)
+		info[3] = mse
+		#print "Test MSE: {}".format(mse)
+		writer.writerow(info)
 
 
 
