@@ -1,10 +1,12 @@
-from pybrain.structure import FeedForwardNetwork
-from pybrain.structure import LinearLayer, SigmoidLayer
-from pybrain.structure import FullConnection
-from pybrain.structure import BiasUnit
-from pybrain.datasets import SupervisedDataSet
-from pybrain.supervised.trainers import BackpropTrainer
-from pybrain.tools.validation import Validator
+#-------------------------------------------------------------------------------
+# Name: cs-qsar-ann-modeling-research
+# Purpose: Common functions library for use in the context of QSAR ANN 
+# model training.
+#
+# Created: 20141701
+# Copyright: (c) CSUSM 2014
+# Licence: MIT
+#-------------------------------------------------------------------------------
 from numpy import *
 import csv
 
