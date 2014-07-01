@@ -1,5 +1,11 @@
-from pyBrainMod import *
-import csv
+from pybrain.structure import FeedForwardNetwork
+from pybrain.structure import LinearLayer, SigmoidLayer
+from pybrain.structure import FullConnection
+from pybrain.structure import BiasUnit
+from pybrain.datasets import SupervisedDataSet
+from pybrain.supervised.trainers import BackpropTrainer
+from pybrain.tools.validation import Validator
+from qsarHelpers import *
 import argparse
 import os
 import math
