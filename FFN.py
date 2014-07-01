@@ -7,6 +7,7 @@ from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.tools.validation import Validator
 from numpy import *
 import csv
+import time
 
 def placeDataIntoArray(fileName):
     with open(fileName, mode='rbU') as csvfile:
@@ -65,7 +66,7 @@ ffn = FeedForwardNetwork()
 # create layers
 inLayer = LinearLayer(TrainValX.shape[1], name="input")
 hiddenLayer = SigmoidLayer(20, name="hidden1")
-hiddenLayer2 = SigmoidLayer(1220, name="hidden2")
+hiddenLayer2 = SigmoidLayer(20, name="hidden2")
 outLayer = LinearLayer(1, name="output")
 
 # add layers to feed forward network
@@ -90,9 +91,7 @@ ffn.addConnection(hidden_to_out)
 # necessary, sort layers into correct/certain order
 ffn.sortModules()
 
-
-ffn.convertToFastNetwork()
-
+#ffn.convertToFastNetwork()
 
 # print "Input layer weights: {}".format(in_to_hidden.params)
 # print "Hidden layer weights: {}".format(hidden_to_out.params)
@@ -121,53 +120,58 @@ writer = csv.writer(outcsv)
 
 writer.writerow(['alpha', 'momentum', 'trainMSE', 'testMSE'])
 
-info = zeros(4)
+info = zeros(5)
 
-# test learning rates
-for i in range(alpha.shape[0]):
-	info[0] = alpha[i]
+trials = 10
+# do n tests of training combos, average results
+for n in range(trials):
 
-	# randomiz weights
-	ffn.randomize()
+	info[0] = n
+	# test learning rates
+	for i in range(alpha.shape[0]):
+		info[1] = alpha[i]
 
-	for k in range(momentum.shape[0]):
+		# randomiz weights
+		ffn.randomize()
 
-		info[1] = momentum[k]
+		for k in range(momentum.shape[0]):
 
-		# Backprop trainer object
-		trainer = BackpropTrainer(ffn, ds, learningrate=alpha[i], momentum=momentum[k])#, verbose=True)
+			info[2] = momentum[k]
 
-		# for j in range(1000):
-		# 	error = trainer.train()
-		# 	if j%10 == 0:
-		# 		print "{} error: {}".format(j, error)
-		# 	# print "All weights: {}".format(ffn.params)
-		# 	if error < .001:
-		# 		break 
+			# Backprop trainer object
+			trainer = BackpropTrainer(ffn, ds, learningrate=alpha[i], momentum=momentum[k])#, verbose=True)
 
-		# splits data into 75% training, 25% validation
-		# train until convergence
-		error = trainer.trainUntilConvergence(maxEpochs=2000, continueEpochs=10)# validationPortion=.X
+			# for j in range(1000):
+			# 	error = trainer.train()
+			# 	if j%10 == 0:
+			# 		print "{} error: {}".format(j, error)
+			# 	# print "All weights: {}".format(ffn.params)
+			# 	if error < .001:
+			# 		break 
 
-		# print results
-		print "alpha: {}, momentum: {}".format(alpha[i], momentum[k])
+			# splits data into 75% training, 25% validation
+			# train until convergence
+			error = trainer.trainUntilConvergence(maxEpochs=2000, continueEpochs=10)# validationPortion=.X
 
-		train_outputs = zeros(TrainValX.shape[0])
-		for j in range(TrainValX.shape[0]):
-			train_outputs[j] = ffn.activate(TrainValX[j])
-			# print train_outputs[j], TrainValY[j]
-		mse = Validator.MSE(train_outputs, TrainValY)
-		info[2] = mse
-		#print "Train MSE: {}".format(mse)
+			# print results
+			print "alpha: {}, momentum: {}".format(alpha[i], momentum[k])
 
-		test_outputs = zeros(TestX.shape[0])
-		for j in range(TestX.shape[0]):
-			test_outputs[j] = ffn.activate(TestX[j])
-			# print test_outputs[j], TestY[j]
-		mse = Validator.MSE(test_outputs, TestY)
-		info[3] = mse
-		#print "Test MSE: {}".format(mse)
-		writer.writerow(info)
+			train_outputs = zeros(TrainValX.shape[0])
+			for j in range(TrainValX.shape[0]):
+				train_outputs[j] = ffn.activate(TrainValX[j])
+				# print train_outputs[j], TrainValY[j]
+			mse = Validator.MSE(train_outputs, TrainValY)
+			info[3] = mse
+			#print "Train MSE: {}".format(mse)
+
+			test_outputs = zeros(TestX.shape[0])
+			for j in range(TestX.shape[0]):
+				test_outputs[j] = ffn.activate(TestX[j])
+				# print test_outputs[j], TestY[j]
+			mse = Validator.MSE(test_outputs, TestY)
+			info[4] = mse
+			#print "Test MSE: {}".format(mse)
+			writer.writerow(info)
 
 
 
