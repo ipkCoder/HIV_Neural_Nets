@@ -463,8 +463,7 @@ def main():
 
     # get training, validation, test data and rescale
     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
-  
-    TrainX, TrainY, TestX = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
+    TrainX, ValidateX, TestX = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
   
     # initial velocities, numbers between 0 and 1
     velocity = createInitVelMat(numOfPop, numOfFea)
@@ -473,12 +472,13 @@ def main():
     fittingStatus = unfit
   
     print "********** time is = ", time.strftime("%H:%M:%S", time.localtime())
-  
+    
     ##################################################################
     while (fittingStatus == unfit):
       # create inititial population and find fitness for each row in population
         population = createInitPopMat(numOfPop, numOfFea)
-        fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(model,fileW, population, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
+        fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(model,fileW, population, 
+            TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
 
     # initialize global best row and fitness to first population row
     globalBestRow = InitializeGlobalBestRow(population[0])
