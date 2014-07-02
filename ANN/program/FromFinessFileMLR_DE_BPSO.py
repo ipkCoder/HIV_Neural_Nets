@@ -6,6 +6,10 @@ import math
 import sys
 import hashlib
 
+#TODO: error in cv_predict, predict in ANN class isn't built for one prediction, handle multiple samples
+#      need to find a way to do prediction for one sample at a time
+#      or else, need to do prediction one at a tine everywhere
+
 # errors: in try block, attempt to train model fails.
 #         not sure why. need to figure out.
 #         training works in test_ann.py, so problem shouldn't be in ANN class
@@ -196,13 +200,14 @@ def rmse(X, Y):
 	return (sum((X-Y)**2)/len(X))**.5
 #------------------------------------------------------------------------------
 
-def cv_predict(set_x, set_y, model):
+def cv_predict(set_x, set_y, val_x, val_y, model):
     """Predict using cross validation."""
+
     yhat = empty_like(set_y)
     for idx in range(0, yhat.shape[0]):
         train_x = delete(set_x, idx, axis=0)
         train_y = delete(set_y, idx, axis=0)
-        modelName = model.train(train_x, train_y)
+        modelName = model.train(train_x, train_y, val_x, val_y)
         yhat[idx] = model.predict(set_x[idx])
     return yhat
 
@@ -281,6 +286,7 @@ def OnlySelectTheOnesColumns(popI):
 def validate_model(model, fileW, population, TrainX, TrainY,\
                    ValidateX, ValidateY, TestX, TestY):
     
+    print TrainY.shape
     numOfPop = population.shape[0]
     fitness = zeros(numOfPop)
     c = 2
@@ -315,9 +321,13 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
         X_validation_masked = ValidateX.T[xi].T
         X_test_masked = TestX.T[xi].T
   
-        model.create_network(X_train_masked.shape[1], 20, 1)
+        model.create_network(X_train_masked.shape[1])
 
-        print model.get_params()
+        # print X_train_masked.shape
+        # print TrainY.shape
+        # print X_validation_masked.shape
+        # print ValidateY.shape
+        # print len(model.get_params())
   
         # try attempt fails
         try:
@@ -329,7 +339,7 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
 
         
         # Computed predicted values using computed y-int and slope 
-        Yhat_cv = cv_predict(X_train_masked, TrainY, model)    # Cross Validation
+        Yhat_cv = cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)    # Cross Validation
         Yhat_validation = model.predict(X_validation_masked)
         Yhat_test = model.predict(X_test_masked)
             
