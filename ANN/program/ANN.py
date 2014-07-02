@@ -8,70 +8,79 @@ from pybrain.tools.validation import Validator
 import numpy as np
 
 class ANN:
-	
-	def create_network(this, nFeatures, hidden1Size, nClasses):# hidden2Size, )
-		# create network object
-		this.ffn = FeedForwardNetwork()
-		
-		# create layer objects
-		inLayer = LinearLayer(nFeatures, name="input")
-		hiddenLayer = SigmoidLayer(hidden1Size, name="hidden1")
-		# hiddenLayer2 = SigmoidLayer(hidden2Size, name="hidden2")
-		outLayer = LinearLayer(nClasses, name="output")
-		
-		# add layers to feed forward network
-		this.ffn.addInputModule(inLayer)
-		this.ffn.addModule(hiddenLayer)
-		# this.ffn.addModule(hiddenLayer2)
-		this.ffn.addOutputModule(outLayer)
+    
+    def __init__(self):
+        self.name="ANN"
+        
+    def get_params(self):
+        print self.ffn
+        return self.ffn.params
+      
+    def create_network(self, nFeatures, hidden1Size=20, nClasses=1):
+        # create network object
+        self.ffn = FeedForwardNetwork()
+            
+        # create layer objects
+        inLayer = LinearLayer(nFeatures, name="input")
+        hiddenLayer = SigmoidLayer(hidden1Size, name="hidden1")
+        # hiddenLayer2 = SigmoidLayer(hidden2Size, name="hidden2")
+        outLayer = LinearLayer(nClasses, name="output")
+            
+        # add layers to feed forward network
+        self.ffn.addInputModule(inLayer)
+        self.ffn.addModule(hiddenLayer)
+        # self.ffn.addModule(hiddenLayer2)
+        self.ffn.addOutputModule(outLayer)
 
-		# add bias unit to layers
-		this.ffn.addModule(BiasUnit(name='bias'))
+        # add bias unit to layers
+        self.ffn.addModule(BiasUnit(name='bias'))
 
-		# establish connections between layers
-		in_to_hidden = FullConnection(inLayer, hiddenLayer)
-		# hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
-		hidden_to_out = FullConnection(hiddenLayer, outLayer)
+        # establish connections between layers
+        in_to_hidden = FullConnection(inLayer, hiddenLayer)
+        # hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
+        hidden_to_out = FullConnection(hiddenLayer, outLayer)
 
-		# add connections to network
-		this.ffn.addConnection(in_to_hidden)
-		# this.ffn.addConnection(hidden_to_hidden)
-		this.ffn.addConnection(hidden_to_out)
+        print "into hidden: {}".format(len(in_to_hidden.params))
+        print "into out: {}".format(len(hidden_to_out.params))
+        # add connections to network
+        self.ffn.addConnection(in_to_hidden)
+        # self.ffn.addConnection(hidden_to_hidden)
+        self.ffn.addConnection(hidden_to_out)
 
-		# necessary, sort layers into correct/certain order
-		this.ffn.sortModules()
-		# randomiz weights
-		this.ffn.randomize()
-		
-		# dataset object
-		this.train_ds = SupervisedDataSet(nFeatures, nClasses)
-		this.validate_ds = SupervisedDataSet(nFeatures, nClasses)
+        # necessary, sort layers into correct/certain order
+        self.ffn.sortModules()
+        # randomiz weights
+        self.ffn.randomize()
+        
+        # dataset object
+        self.train_ds = SupervisedDataSet(nFeatures, nClasses)
+        self.validate_ds = SupervisedDataSet(nFeatures, nClasses)
 
-	# train network
-	def train(this, TrainX, TrainY, ValidateX, ValidateY):
-		# should clear dataset
+    # train network
+    def train(self, TrainX, TrainY, ValidateX, ValidateY):
+        # should clear dataset
 
-		# add data to dataset object (ds)
-		for i in range(TrainX.shape[0]):
-			this.train_ds.addSample(TrainX[i], TrainY[i])
+        # add data to dataset object (ds)
+        for i in range(TrainX.shape[0]):
+            self.train_ds.addSample(TrainX[i], TrainY[i])
 
-		for i in range(ValidateX.shape[0]):
-			this.validate_ds.addSample(ValidateX[i], ValidateY[i])
+        for i in range(ValidateX.shape[0]):
+            self.validate_ds.addSample(ValidateX[i], ValidateY[i])
 
-		# Backprop trainer object
-		this.trainer = BackpropTrainer(this.ffn, learningrate=.0775, momentum=.05)
-		
-		this.trainer.trainUntilConvergence(trainingData=this.train_ds, validationData=this.validate_ds, maxEpochs=500, continueEpochs=10)
+        # Backprop trainer object
+        self.trainer = BackpropTrainer(self.ffn, learningrate=.0775, momentum=.05)
 
-		return 'ANN'
+        self.trainer.trainUntilConvergence(trainingData=self.train_ds, validationData=self.validate_ds, maxEpochs=500, continueEpochs=10)
 
-	# predict depenent variable for dataset
-	def predict(this, data):
-		
-		outputs = np.zeros(data.shape[0])
-		for i in range(data.shape[0]):
-			outputs[i] = this.ffn.activate(data[i])
-		return outputs
+        return 'ANN'
+
+    # predict depenent variable for dataset
+    def predict(self, data):
+
+        outputs = np.zeros(data.shape[0])
+        for i in range(data.shape[0]):
+            outputs[i] = self.ffn.activate(data[i])
+        return outputs
 
 
 
