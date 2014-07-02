@@ -5,6 +5,7 @@ from pybrain.structure import BiasUnit
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.tools.validation import Validator
+import numpy as np
 
 class ANN:
 
@@ -56,13 +57,17 @@ class ANN:
 			this.ds.addSample(TrainX[i], TrainY[i])
 
 		# Backprop trainer object
-		this.trainer = BackpropTrainer(this.ffn, this.ds, learningrate=.0775, momentum=.05)
+		this.trainer = BackpropTrainer(this.ffn, this.ds, learningrate=.0775, momentum=.05)#, verbose=True)
 		
-		this.trainer.trainUntilConvergence(maxEpochs=2000, continueEpochs=10)
+		this.trainer.trainUntilConvergence(maxEpochs=3000, continueEpochs=10)
 
-	# predict depenent variable for one sample
-	def predict(this, features):
-		return this.ffn.activate(features)
+	# predict depenent variable for dataset
+	def predict(this, data):
+		
+		outputs = np.zeros(data.shape[0])
+		for i in range(data.shape[0]):
+			outputs[i] = this.ffn.activate(data[i])
+		return outputs
 
 
 
