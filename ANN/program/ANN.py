@@ -59,10 +59,9 @@ class ANN:
 			this.validate_ds.addSample(ValidateX[i], ValidateY[i])
 
 		# Backprop trainer object
-		this.trainer = BackpropTrainer(this.ffn, learningrate=.0775, momentum=.05, verbose=True)
+		this.trainer = BackpropTrainer(this.ffn, learningrate=.0775, momentum=.05)
 		
-		this.trainer.trainUntilConvergence(trainingdata=tarin_ds, validationdata=validate_ds, 
-			maxEpochs=500, continueEpochs=10)
+		this.trainer.trainUntilConvergence(trainingData=this.train_ds, validationData=this.validate_ds, maxEpochs=500, continueEpochs=10)
 
 		return 'ANN'
 
