@@ -10,16 +10,16 @@ import numpy as np
 class ANN:
 
 	# set up network
-	def __init__(this, nFeatures, hidden1Size, hidden2Size, nClasses):
+	def __init__(this, nFeatures, hidden1Size = 20, hidden2Size = 20, nClasses = 1):
 		
 		# create network object
 		this.ffn = FeedForwardNetwork()
 		
 		# create layer objects
-		inLayer = LinearLayer(nFeatures, name="input")
-		hiddenLayer = SigmoidLayer(hidden1Size, name="hidden1")
+		inLayer      = LinearLayer(nFeatures, name="input")
+		hiddenLayer  = SigmoidLayer(hidden1Size, name="hidden1")
 		hiddenLayer2 = SigmoidLayer(hidden2Size, name="hidden2")
-		outLayer = LinearLayer(nClasses, name="output")
+		outLayer     = LinearLayer(nClasses, name="output")
 		
 		# add layers to feed forward network
 		this.ffn.addInputModule(inLayer)
@@ -31,9 +31,9 @@ class ANN:
 		this.ffn.addModule(BiasUnit(name='bias'))
 
 		# establish connections between layers
-		in_to_hidden = FullConnection(inLayer, hiddenLayer)
+		in_to_hidden     = FullConnection(inLayer, hiddenLayer)
 		hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
-		hidden_to_out = FullConnection(hiddenLayer, outLayer)
+		hidden_to_out    = FullConnection(hiddenLayer, outLayer)
 
 		# add connections to network
 		this.ffn.addConnection(in_to_hidden)
