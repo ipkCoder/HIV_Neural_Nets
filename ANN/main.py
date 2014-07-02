@@ -19,6 +19,8 @@ def main(trainDataPath, train_pIC50Path, validationDataPath, validation_pIC50Pat
         modeler = ANN(TrainValX.shape[1]);
         
         modeler.train(TrainX,TrainY);
+        
+        # TODO: reorganizing, roll-up any relevant code from main into seperate module(s)
         # Backprop trainer object
         #trainer = BackpropTrainer(ffn, ds)#, learningrate=.4, momentum=.2)#, verbose=True)
 
@@ -64,7 +66,7 @@ def main(trainDataPath, train_pIC50Path, validationDataPath, validation_pIC50Pat
 if __name__ == '__main__':
     try:
         parser = argparse.ArgumentParser(prog="pyBrain_ANN"
-                                         ,description='Trains an Artificial Neural Network  regression model'\
+                                         ,description='Trains an Artificial Neural Network '\
                                              'using the pyBrain library to generate an optimal QSAR-regression model');
         parser.add_argument('-t','--trainingDataFile'
                         ,dest="trainingData"
