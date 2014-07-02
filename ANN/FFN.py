@@ -1,11 +1,5 @@
-from pybrain.structure import FeedForwardNetwork
-from pybrain.structure import LinearLayer, SigmoidLayer
-from pybrain.structure import FullConnection
-from pybrain.structure import BiasUnit
-from pybrain.datasets import SupervisedDataSet
-from pybrain.supervised.trainers import BackpropTrainer
-from pybrain.tools.validation import Validator
 from qsarHelpers import *
+from ANN import *
 import argparse
 import os
 import math
@@ -22,65 +16,24 @@ def main(trainDataPath, train_pIC50Path, validationDataPath, validation_pIC50Pat
         # rescale data
         TrainValX, TrainValY, TestX, TestY = rescaleTheData(TrainValX, TrainValY, TestX, TestY)
 
-        # network object
-        ffn = FeedForwardNetwork()
-
-        # create layers
-        inLayer        = LinearLayer(TrainValX.shape[1], name="input")
-        hiddenLayer    = SigmoidLayer(20, name="hidden1")
-        # hiddenLayer2 = SigmoidLayer(20, name="hidden2")
-        outLayer       = LinearLayer(1, name="output")
-
-        # add layers to feed forward network
-        ffn.addInputModule(inLayer)
-        ffn.addModule(hiddenLayer)
-        # ffn.addModule(hiddenLayer2)
-        ffn.addOutputModule(outLayer)
-
-        # add bias unit to layers
-        ffn.addModule(BiasUnit(name='bias'))
-
-        # establish connections between layers
-        in_to_hidden       = FullConnection(inLayer, hiddenLayer)
-        # hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
-        hidden_to_out      = FullConnection(hiddenLayer, outLayer)
-
-        # add connections to network
-        ffn.addConnection(in_to_hidden)
-        # ffn.addConnection(hidden_to_hidden)
-        ffn.addConnection(hidden_to_out)
-
-        # necessary, sort layers into correct/certain order
-        ffn.sortModules()
-        ffn.convertToFastNetwork()
-        # print "Input layer weights: {}".format(in_to_hidden.params)
-        # print "Hidden layer weights: {}".format(hidden_to_out.params)
-        # print "All weights: {}".format(ffn.params)
-
-        # dataset object
-        ds = SupervisedDataSet(TrainValX.shape[1],1)
-
-        # add data to dataset object (ds)
-        for i in range(TrainValX.shape[0]):
-            # print data[i]
-            # print y[i]
-            ds.addSample(TrainValX[i], TrainValY[i])
-
+        modeler = ANN(TrainValX.shape[1]);
+        
+        modeler.train(TrainX,TrainY);
         # Backprop trainer object
-        trainer = BackpropTrainer(ffn, ds)#, learningrate=.4, momentum=.2)#, verbose=True)
+        #trainer = BackpropTrainer(ffn, ds)#, learningrate=.4, momentum=.2)#, verbose=True)
 
         # learning rates to test
         # note: best rates have been between .07 and .1, but seems to very inbetween
         # most consistent between .07 and .085
-        alpha = array([0, .05, .07, .0775, .085, .1, .2])#, .15, .2, .25, .3, 3.5])
-        momentum = array([.05, .1, .15])
+        #alpha = array([0, .05, .07, .0775, .085, .1, .2])#, .15, .2, .25, .3, 3.5])
+        #momentum = array([.05, .1, .15])
         # test learning rates
-        for i in range(alpha.shape[0]):
-            # randomiz weights
-            ffn.randomize();
-            for k in range(momentum.shape[0]):
+        #for i in range(alpha.shape[0]):
+            # randomize weights
+            #ffn.randomize();
+            #for k in range(momentum.shape[0]):
                 # Backprop trainer object
-                trainer = BackpropTrainer(ffn, ds, learningrate=alpha[i], momentum=momentum[k])
+                #trainer = BackpropTrainer(ffn, ds, learningrate=alpha[i], momentum=momentum[k])
                 #, verbose=True)
                 # for j in range(1000):
                 # 	error = trainer.train()
@@ -91,19 +44,19 @@ def main(trainDataPath, train_pIC50Path, validationDataPath, validation_pIC50Pat
                 # 		break 
                 # splits data into 75% training, 25% validation
                 # train until convergence
-                error = trainer.trainUntilConvergence(maxEpochs=20, continueEpochs=10)# validationPortion=.X
+                #error = trainer.trainUntilConvergence(maxEpochs=20, continueEpochs=10)# validationPortion=.X
                 # print results
-                print "alpha: {}, momentum: {}".format(alpha[i], momentum[k]);
-                train_outputs = zeros(TrainValX.shape[0]);
-                for j in range(TrainValX.shape[0]):
-                    train_outputs[j] = ffn.activate(TrainValX[j]);
+                #print "alpha: {}, momentum: {}".format(alpha[i], momentum[k]);
+                #train_outputs = zeros(TrainValX.shape[0]);
+                #for j in range(TrainValX.shape[0]):
+                    #train_outputs[j] = ffn.activate(TrainValX[j]);
                     # print train_outputs[j], TrainValY[j]
-                    print "Train MSE: {}".format(Validator.MSE(train_outputs, TrainValY));
-                    test_outputs = zeros(TestX.shape[0]);
-                    for j in range(TestX.shape[0]):
-                        test_outputs[j] = ffn.activate(TestX[j]);
+                    #print "Train MSE: {}".format(Validator.MSE(train_outputs, TrainValY));
+                    #test_outputs = zeros(TestX.shape[0]);
+                    #for j in range(TestX.shape[0]):
+                        #test_outputs[j] = ffn.activate(TestX[j]);
                         # print test_outputs[j], TestY[j]
-                        print "Test MSE: {}".format(Validator.MSE(test_outputs, TestY));
+                        #print "Test MSE: {}".format(Validator.MSE(test_outputs, TestY));
         return 0;
     except:
         print "error in main";
