@@ -6,6 +6,9 @@ import math
 import sys
 import hashlib
 
+# errors: in try block, attempt to train model fails.
+#         not sure why. need to figure out.
+#         training works in test_ann.py, so problem shouldn't be in ANN class
 #------------------------------------------------------------------------------
 
 
@@ -316,6 +319,7 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
 
         print model.get_params()
   
+        # try attempt fails
         try:
             model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
             print "finished training"
