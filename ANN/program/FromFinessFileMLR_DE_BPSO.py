@@ -6,13 +6,12 @@ import math
 import sys
 import hashlib
 
-#TODO: error in cv_predict, predict in ANN class isn't built for one prediction, handle multiple samples
-#      need to find a way to do prediction for one sample at a time
-#      or else, need to do prediction one at a tine everywhere
+#TODO: most of the time dealing with population is spent in cv_predict
+#      have to train number of models (one without each sample)
+#      dealing with one population member takes about five minutes
+#      about 95% of this time is spent in cv_predict
+#      seems like we should be able to use CUDA for parallel programming 
 
-# errors: in try block, attempt to train model fails.
-#         not sure why. need to figure out.
-#         training works in test_ann.py, so problem shouldn't be in ANN class
 #------------------------------------------------------------------------------
 
 
