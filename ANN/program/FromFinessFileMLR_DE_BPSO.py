@@ -200,15 +200,21 @@ def rmse(X, Y):
 	return (sum((X-Y)**2)/len(X))**.5
 #------------------------------------------------------------------------------
 
-def cv_predict(set_x, set_y, val_x, val_y, model):
+def cv_predict(set_x, set_y, val_x, val_y, model, start_time):
     """Predict using cross validation."""
 
     yhat = empty_like(set_y)
     for idx in range(0, yhat.shape[0]):
         train_x = delete(set_x, idx, axis=0)
         train_y = delete(set_y, idx, axis=0)
-        modelName = model.train(train_x, train_y, val_x, val_y)
-        yhat[idx] = model.predict(set_x[idx])
+        try:
+            modelName = model.train(train_x, train_y, val_x, val_y)
+            yhat[idx] = model.predict(set_x[idx])
+            # end_time = time.time()
+            # print "Trained cv model {} in {} sec".format(idx, (start_time-end_time))
+            # start_time = end_time
+        except:
+            print "Error with training cv model for sample {}".format(idx+1)
     return yhat
 
 #------------------------------------------------------------------------------
@@ -283,10 +289,9 @@ def OnlySelectTheOnesColumns(popI):
 #------------------------------------------------------------------------------
 
 #Ahmad Hadaegh: Modified  on: July 16, 2013
-def validate_model(model, fileW, population, TrainX, TrainY,\
+def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
                    ValidateX, ValidateY, TestX, TestY):
     
-    print TrainY.shape
     numOfPop = population.shape[0]
     fitness = zeros(numOfPop)
     c = 2
@@ -304,9 +309,12 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
 
     unfit = 1000
     itFits = 1
+
     # analyze one population row at a time
     for i in range(numOfPop):
-        
+
+        pop_time = time.time()
+
         xi = OnlySelectTheOnesColumns(population[i])
       
         idx = hashlib.sha1(array(xi)).digest() # Hash
@@ -337,12 +345,18 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             print "didn't train"
             return unfit, fitness
 
-        
+        model_time = time.time()
+        print "Train model for population {}: {}".format(i, (model_time - pop_time))
+
         # Computed predicted values using computed y-int and slope 
-        Yhat_cv = cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)    # Cross Validation
+        Yhat_cv = cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model, model_time)    # Cross Validation
+        
+        cv_time = time.time()
+        print "Cross validate for {}: {}".format(i, (cv_time - model_time))
+
         Yhat_validation = model.predict(X_validation_masked)
         Yhat_test = model.predict(X_test_masked)
-            
+
         # Compute R2 statistics (Prediction for Valiation and Test set)
         q2_loo = r2(TrainY, Yhat_cv)
         r2pred_validation = r2Pred(TrainY, ValidateY, Yhat_validation)
@@ -392,6 +406,9 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
         yHatValidation[idx] = Yhat_validation.tolist()
         yTest[idx] = TestY.tolist()
         yHatTest[idx] = Yhat_test.tolist()
+
+        pop_end_time = time.time()
+        print "Trained and found results for population {}: {}".format(i, (pop_end_time - pop_time))
         
         
     #printing the information into the file
@@ -400,6 +417,9 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
                 trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
                 trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
                 yValidation, yHatValidation, yTest, yHatTest)
+
+    end_time = time.time()
+    print "Validated model: {} min".format(((start_time - end_time)/60))
     
     return itFits, fitness
 #------------------------------------------------------------------------------  
