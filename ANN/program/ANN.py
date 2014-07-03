@@ -40,8 +40,9 @@ class ANN:
         # hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
         hidden_to_out = FullConnection(hiddenLayer, outLayer)
 
-        print "into hidden: {}".format(len(in_to_hidden.params))
-        print "into out: {}".format(len(hidden_to_out.params))
+        # print "into hidden: {}".format(len(in_to_hidden.params))
+        # print "into out: {}".format(len(hidden_to_out.params))
+        
         # add connections to network
         self.ffn.addConnection(in_to_hidden)
         # self.ffn.addConnection(hidden_to_hidden)
@@ -49,8 +50,6 @@ class ANN:
 
         # necessary, sort layers into correct/certain order
         self.ffn.sortModules()
-        # randomiz weights
-        self.ffn.randomize()
         
         # dataset object
         self.train_ds = SupervisedDataSet(nFeatures, nClasses)
@@ -58,7 +57,9 @@ class ANN:
 
     # train network
     def train(self, TrainX, TrainY, ValidateX, ValidateY):
-        # should clear dataset
+        # clear old dataset
+        self.train_ds.clear()
+        self.validate_ds.clear()
 
         # add data to dataset object (ds)
         for i in range(TrainX.shape[0]):
@@ -67,6 +68,9 @@ class ANN:
         for i in range(ValidateX.shape[0]):
             self.validate_ds.addSample(ValidateX[i], ValidateY[i])
 
+        # randomiz weights
+        self.ffn.randomize()
+        
         # Backprop trainer object
         self.trainer = BackpropTrainer(self.ffn, learningrate=.0775, momentum=.05)
 
@@ -77,10 +81,13 @@ class ANN:
     # predict depenent variable for dataset
     def predict(self, data):
 
-        outputs = np.zeros(data.shape[0])
-        for i in range(data.shape[0]):
-            outputs[i] = self.ffn.activate(data[i])
-        return outputs
+        if(len(data.shape) == 1):
+            return self.ffn.activate(data)
+        else:
+            outputs = np.zeros(data.shape[0])
+            for i in range(data.shape[0]):
+                outputs[i] = self.ffn.activate(data[i].tolist())
+            return outputs
 
 
 
