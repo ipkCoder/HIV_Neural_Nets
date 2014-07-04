@@ -9,6 +9,38 @@
 #-------------------------------------------------------------------------------
 from numpy import *
 import csv
+from collections import namedtuple
+import os
+import datetime
+
+# Since we can't declare constants in Python, so we use a namedtuple
+# to define immutable index value(s) for log entry types.  A namedtuple
+# throws an error if a tuple value is updated after initialization.
+Constants      = namedtuple('constants', ['info','warning','error'])
+logtype        = Constants(0,1,2);
+reverseLookup  = {0:"info",1:"warning",2:"error"};
+
+def log(lineEntry = "", category = logtype.info):
+    '''Writes non-empty lines to a log file in the relative
+        directory of the ANN module. Format tracelog_{YYYY-MM-DD}.log'''
+    try:
+        # don't log empty lines
+        if not lineEntry:
+            return 0;
+
+        localCategory = category;
+        if reverseLookup.has_key(localCategory) is False:
+                # Default to "info" log entry type
+                localCategory = log.info;
+        logName          = "tracelog_{0}.log".format(datetime.datetime.now().strftime("%Y-%m-%d"));
+        logFile          = os.path.join(os.getcwd(), logName);
+        entryDate        = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f");
+        # appends to existing log file, else writes a new log file
+        with open(logFile,"a") as log:
+            log.writelines("".join([entryDate, "\t", reverseLookup[localCategory], "\t", lineEntry, "\n"]));
+        return 0;
+    except:
+        print "error writing log entry: {0} to log file {1}".format(lineEntry,logFile);
 
 def placeDataIntoArray(fileName):
     '''Add comma-delimited file content to a data array'''

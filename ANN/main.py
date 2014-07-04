@@ -103,6 +103,7 @@ if __name__ == '__main__':
 
         if sum(inputMask) != 0:
             print "invalid input parameters"
+            log("invalid input parameters", logtype.warning);
         else:
             trainDataPath        = args.trainingData;
             train_pIC50Path      = args.train_pIC50;
