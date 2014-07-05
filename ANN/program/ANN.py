@@ -61,6 +61,7 @@ class ANN:
         self.train_ds.clear()
         self.validate_ds.clear()
 
+
         # add data to dataset object (ds)
         for i in range(TrainX.shape[0]):
             self.train_ds.addSample(TrainX[i], TrainY[i])
@@ -70,9 +71,9 @@ class ANN:
 
         # randomiz weights
         self.ffn.randomize()
-        
+
         # Backprop trainer object
-        self.trainer = BackpropTrainer(self.ffn, learningrate=.0775, momentum=.05)
+        self.trainer = BackpropTrainer(self.ffn, learningrate=.0775, momentum=.1)
 
         self.trainer.trainUntilConvergence(trainingData=self.train_ds, validationData=self.validate_ds, maxEpochs=500, continueEpochs=10)
 
@@ -81,12 +82,13 @@ class ANN:
     # predict depenent variable for dataset
     def predict(self, data):
 
+        # if only make prediction for one sample
         if(len(data.shape) == 1):
             return self.ffn.activate(data)
         else:
             outputs = np.zeros(data.shape[0])
             for i in range(data.shape[0]):
-                outputs[i] = self.ffn.activate(data[i].tolist())
+                outputs[i] = self.ffn.activate(data[i])
             return outputs
 
 

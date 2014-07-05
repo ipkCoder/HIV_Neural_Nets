@@ -199,7 +199,7 @@ def rmse(X, Y):
 	return (sum((X-Y)**2)/len(X))**.5
 #------------------------------------------------------------------------------
 
-def cv_predict(set_x, set_y, val_x, val_y, model, start_time):
+def cv_predict(set_x, set_y, val_x, val_y, model):
     """Predict using cross validation."""
 
     yhat = empty_like(set_y)
@@ -339,7 +339,7 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
         # try attempt fails
         try:
             model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
-            print "finished training"
+            # print "finished training"
         except:
             print "didn't train"
             return unfit, fitness
@@ -348,7 +348,7 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
         print "Train model for population {}: {}".format(i, (model_time - pop_time))
 
         # Computed predicted values using computed y-int and slope 
-        Yhat_cv = cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model, model_time)    # Cross Validation
+        Yhat_cv = cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)    # Cross Validation
         
         cv_time = time.time()
         print "Cross validate for {}: {}".format(i, (cv_time - model_time))
@@ -416,9 +416,6 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
                 trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
                 trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
                 yValidation, yHatValidation, yTest, yHatTest)
-
-    end_time = time.time()
-    print "Validated model: {} min".format(((start_time - end_time)/60))
     
     return itFits, fitness
 #------------------------------------------------------------------------------  
