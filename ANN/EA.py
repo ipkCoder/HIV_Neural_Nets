@@ -3,8 +3,8 @@
 # Purpose: Container module for evolutionary algorithm-based feature selection
 # module.
 #
-# Created: 20141704
-# Copyright: (c) CSUSM 2014
+# Created: 20140704
+# Copyright: (c) 2014
 # Licence: MIT
 #-------------------------------------------------------------------------------
 
