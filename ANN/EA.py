@@ -3,7 +3,7 @@
 # Purpose: Container module for evolutionary algorithm-based feature selection
 # module.
 #
-# Created: 20141701
+# Created: 20141704
 # Copyright: (c) CSUSM 2014
 # Licence: MIT
 #-------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ def mainGAEvolve(eaPopulation):
         print("Best individual is %s, %s" % (best_ind, best_ind.fitness.values))
         return 0;
     except:
-        print "error evolving feature parameterss"
+        print "error evolving feature parameters"
 
 class EA:
     '''Class container for an evolutionary algorithm'''
