@@ -36,11 +36,31 @@ def createAnOutputFile():
 # error with predicting X_validation_masked
 
 def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
+
     xi = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
+    
     X_train_masked = TrainX.T[xi].T
     X_validation_masked = ValidateX.T[xi].T
-    Yhat_cv = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, ValidateX, ValidateY, model)
+
+    # create network to fit new set of features (possible diff number of inputs)
+    model.create_network(X_train_masked.shape[1])
+
+    # train new model
+    try:
+        model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
+    except:
+        print "Error training in findFitnessOfARow"
+
+    # print X_train_masked.shape
+    # print TrainY.shape
+    # print X_validation_masked.shape
+    # print ValidateY.shape
+
+    Yhat_cv = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)
     Yhat_validation = model.predict(X_validation_masked)
+
+    print "Predicted in findFitnessOfARow"
+
     Y_fitness = append(TrainY, ValidateY)
     Yhat_fitness = append(Yhat_cv, Yhat_validation)
     fitness = FromFinessFileMLR_DE_BPSO.calc_fitness(xi, Y_fitness, Yhat_fitness, c=2)
@@ -160,6 +180,8 @@ def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
     numOfFea = P.shape[0]
     CRrate = 0.8 #it is a common value when we do DE algorithm
     U = zeros(numOfFea)
+    
+    # create new vector with different set of features (combo of P and V)
     for j in range(numOfFea):
         R = random.uniform(0, 1)
         if (R < CRrate):
@@ -188,8 +210,9 @@ def findMutationFunction(V1, V2, V3):
 def selectARowFromPopulation(parentPop):
    numOfPop = parentPop.shape[0]
    numOfFea = parentPop.shape[1]
- 
+   # select random row index
    r = int(random.uniform(1,numOfPop))
+   # copy row and return
    anyRow = zeros(numOfFea)
    for j in range(numOfFea):
        anyRow[j] = parentPop[r][j]
@@ -229,7 +252,8 @@ def findTheRightVector(rowI, parentPop, fitness, model, \
     while (U.sum() < 3):
         V1, V2, V3 = selectThreeRandomRows(parentPop)
         V = findMutationFunction(V1, V2, V3)
-        U = crossover(P, V, model,TrainX, TrainY, ValidateX, ValidateY )
+        U = crossover(P, V, model,TrainX, TrainY, ValidateX, ValidateY)
+        print "Descriptors in U: {}".format(U.sum())
   
     fitnessP = fitness[rowI]
     fitnessU = findFitnessOfARow(model, U, TrainX, TrainY, ValidateX, ValidateY)
@@ -384,6 +408,7 @@ def IterateNtimes(start_time, model, fileW, fitness, velocity, population, paren
     # loop for n generations
     for i in range(numOfGenerations):
       
+        generation_start_time = time.time()
         # terminate if golbalBestFitness hasn't changed in 30 generations
         oldFitness, Times = checkterTerminationStatus(Times, oldFitness, globalBestFitness)
       
@@ -393,11 +418,15 @@ def IterateNtimes(start_time, model, fileW, fitness, velocity, population, paren
         fittingStatus = unfit
         # find new population matrix and fitness vector
         while (fittingStatus == unfit):
-           population = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
+            new_pop_time = time.time()
+            population = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
                         population,localBestMatrix, globalBestRow, \
                         TrainX, TrainY, ValidateX, ValidateY)
-           fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(model,fileW, \
+            print "Found new pop: {} min".format(((time.time() - new_pop_time)/60))
+            start_val_model = time.time()
+            fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(start_val_model, model,fileW, \
                         population, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
+            print "Validated model: {} min".format(((time.time() - start_val_model)/60))
       
         #remember current population matrix
         parentPop = getParentPopulation(population)
@@ -417,7 +446,7 @@ def IterateNtimes(start_time, model, fileW, fitness, velocity, population, paren
         beta = beta + betaIncre
 
         end_time = time.time()
-        print "Generation {} complete: {} min".format(i, ((end_time - start_time)/60))
+        print "Generation {} complete: {} min".format(i, ((end_time - generation_start_time)/60))
         
     return
 
@@ -460,7 +489,7 @@ def main():
     fileW = createAnOutputFile()
     model = ANN.ANN()
 
-    numOfPop = 5   # should be 50 population
+    numOfPop = 4  # should be 50 population
     numOfFea = 396  # should be 396 descriptors
     unfit = 1000
 
