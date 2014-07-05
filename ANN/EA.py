@@ -133,10 +133,10 @@ class EA:
         Evolution components
         """
         this.toolbox.register("evaluate",evalGAOneMax)
-        # configure a single-point cross-over
+        # configure a two-point cross-over
         this.toolbox.register("mate", tools.cxESTwoPoint)
         # configure a .05 probability of mutation
-        this.toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)
+        this.toolbox.register("mutate", tools.mutFlipBit, indpb=this.mutchance)
         this.toolbox.register("select", tools.selTournament, tournsize = 3)
 
         # Collect population's initial fitness'
