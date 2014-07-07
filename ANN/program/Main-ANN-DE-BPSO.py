@@ -15,22 +15,25 @@ def getTwoDecPoint(x):
 
 #------------------------------------------------------
 def createAnOutputFile():
-    file_name = None
-    algorithm = None
-    timestamp = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-    if ( (file_name == None) and (algorithm != None)):
-        file_name = "{}_{}_gen{}_{}.csv".format(alg.__class__.__name__,
-                        alg.model.__class__.__name__, alg.gen_max,timestamp)
-    elif file_name==None:
-        file_name = "{}.csv".format(timestamp)
-    fileOut = file(file_name, 'wb')
-    fileW = csv.writer(fileOut)
+    try:
+        file_name = None
+        algorithm = None
+        timestamp = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
+        if ( (file_name == None) and (algorithm != None)):
+            file_name = "{}_{}_gen{}_{}.csv".format(alg.__class__.__name__,
+                            alg.model.__class__.__name__, alg.gen_max,timestamp)
+        elif file_name==None:
+            file_name = "{}.csv".format(timestamp)
+        fileOut = file(file_name, 'wb')
+        fileW = csv.writer(fileOut)
             
-    fileW.writerow(['Descriptor ID', 'No. Descriptors', 'Fitness', 'Model','R2', 'Q2', \
-            'R2Pred_Validation', 'R2Pred_Test','SEE_Train', 'SDEP_Validation', 'SDEP_Test', \
-            'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', 'yHat_Test'])
+        fileW.writerow(['Descriptor ID', 'No. Descriptors', 'Fitness', 'Model','R2', 'Q2', \
+                'R2Pred_Validation', 'R2Pred_Test','SEE_Train', 'SDEP_Validation', 'SDEP_Test', \
+                'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', 'yHat_Test'])
     
-    return fileW
+        return fileW;
+    except:
+        print "error creting outout file"
 #------------------------------------------------------------------------------
 
 # error with predicting X_validation_masked
@@ -107,42 +110,50 @@ def getAValidRow(population, eps=0.015):
     return V
 #------------------------------------------------------------------------------
 def createInitVelMat(numOfPop,numOfFea):
-    velocity = random.random((numOfPop,numOfFea))
-    for i in range(numOfPop):
-        for j in range(numOfFea):
-            velocity[i][j] = random.random() # any random number between 0 and 1
-    return velocity
-
+    try:
+        velocity = random.random((numOfPop,numOfFea))
+        for i in range(numOfPop):
+            for j in range(numOfFea):
+                velocity[i][j] = random.random() # any random number between 0 and 1
+        return velocity;
+    except:
+        print "error creating intitial velocity matrix."
 #------------------------------------------------------
 def createInitPopMat(numOfPop, numOfFea):
-    population = zeros((numOfPop,numOfFea))
-    for i in range(numOfPop):
-        V = getAValidRow(population)
-        while (not theRowIsUniqueInPop(i,V, population)):
-            V = getAValidRow(population)   
-        for j in range(numOfFea):
-            population[i][j] = V[j]
+    try:
+        population = zeros((numOfPop,numOfFea))
+        for i in range(numOfPop):
+            V = getAValidRow(population)
+            while (not theRowIsUniqueInPop(i,V, population)):
+                V = getAValidRow(population)   
+            for j in range(numOfFea):
+                population[i][j] = V[j]
 
-    return population
+        return population
+    except:
+        print "error getting initial population matrix"
 #------------------------------------------------------
 def findGlobalBest(population, fitness, globalBestRow,globalBestFitness):
-    numOfPop = population.shape[0]
-    numOfFea = population.shape[1]
-    k = -1
-    min = fitness[0]
-    # find min fitness and corresponding population row index (k)
-    for i in range(numOfPop):
-        if (fitness[i] < min):
-            min = fitness[i]
-            k = i
+    try:
+        numOfPop = population.shape[0]
+        numOfFea = population.shape[1]
+        k = -1
+        min = fitness[0]
+        # find min fitness and corresponding population row index (k)
+        for i in range(numOfPop):
+            if (fitness[i] < min):
+                min = fitness[i]
+                k = i
 
-    # get global best row (combination of feature selections)
-    if (min < globalBestFitness):
-        globalBestFitness = min
-        for j in range(numOfFea):
-            globalBestRow[j] = population[k][j]
+        # get global best row (combination of feature selections)
+        if (min < globalBestFitness):
+            globalBestFitness = min
+            for j in range(numOfFea):
+                globalBestRow[j] = population[k][j]
                 
-    return globalBestRow, globalBestFitness
+        return globalBestRow, globalBestFitness;
+    except:
+        print "error finding global best";
 
 #------------------------------------------------------
 def findLocalBestMatrix (population, fitness, localBestFitness, localBestMatrix):
@@ -177,9 +188,11 @@ def rowExistInParentPop(V, parentPop):
             return 1
 #------------------------------------------------------
 def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
+    '''Core DE algoritm finds a candidate solution(agent) 
+        among the population.'''
     numOfFea = P.shape[0]
-    CRrate = 0.8 #it is a common value when we do DE algorithm
-    U = zeros(numOfFea)
+    CRrate   = 0.8 #it is a common value when we do DE algorithm
+    U        = zeros(numOfFea)
     
     # create new vector with different set of features (combo of P and V)
     for j in range(numOfFea):
@@ -198,22 +211,30 @@ def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
         return V
     
 #------------------------------------------------------
-def findMutationFunction(V1, V2, V3):
+def mutate(V1, V2, V3):
+    '''Creates a mutant variant feature descriptor 
+    row vector from a set of three mutually distinct 
+    candidate row vectors.'''
     numOfFea = V1.shape[0]
-    F = 0.5 # it is a common value when we do DE algorithm
-    V = zeros(numOfFea)
+    # it is a common value when we do DE algorithm.
+    # Formally 'F' is defined as the differential weight,
+    # a tuning parameter, i.e. a constant, applied in the context of DE 
+    # crossover and mutation functions.
+    # TODO: This should be passed as an a function parameter
+    # with a default value set to 0.5
+    F        = 0.5
+    V        = zeros(numOfFea)
     for i in range (numOfFea):
         V[i] = V3[i] + (F *(V2[i] - V1[i]))
-    return V
-
+    return V;
 #------------------------------------------------------        
 def selectARowFromPopulation(parentPop):
    numOfPop = parentPop.shape[0]
    numOfFea = parentPop.shape[1]
    # select random row index
-   r = int(random.uniform(1,numOfPop))
+   r        = int(random.uniform(1,numOfPop))
    # copy row and return
-   anyRow = zeros(numOfFea)
+   anyRow   = zeros(numOfFea)
    for j in range(numOfFea):
        anyRow[j] = parentPop[r][j]
    return anyRow
@@ -232,17 +253,16 @@ def selectThreeRandomRows(parentPop):
     while (equal(V3,V1)) or (equal(V3,V2)):
         V3 = selectARowFromPopulation(parentPop)
     
-    return V1, V2, V3
+    return V1, V2, V3;
 
 #------------------------------------------------------
 def findTheRightVector(rowI, parentPop, fitness, model, \
                        TrainX, TrainY, ValidateX, ValidateY):
-
+    '''This is the mutation function'''
     numOfPop = parentPop.shape[0] # why have, not used ???
     numOfFea = parentPop.shape[1]
-    
-    P = zeros(numOfFea)
-    U = zeros(numOfFea)
+    P        = zeros(numOfFea)
+    U        = zeros(numOfFea)
 
     # P is same as parent row i
     for j in range(numOfFea):
@@ -251,8 +271,8 @@ def findTheRightVector(rowI, parentPop, fitness, model, \
     # find new row combination by using mutation function on three randowm rows and using cross over function, if new row has lower fitness return new row, else return old row
     while (U.sum() < 3):
         V1, V2, V3 = selectThreeRandomRows(parentPop)
-        V = findMutationFunction(V1, V2, V3)
-        U = crossover(P, V, model,TrainX, TrainY, ValidateX, ValidateY)
+        V          = mutate(V1, V2, V3)
+        U          = crossover(P, V, model,TrainX, TrainY, ValidateX, ValidateY)
         print "Descriptors in U: {}".format(U.sum())
   
     fitnessP = fitness[rowI]
@@ -313,9 +333,9 @@ def findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
 
     numOfPop = population.shape[0]
     numOfFea = population.shape[1]
-    p = (.5) * (1+alpha)
-    q = (1 - beta)
-    F = 0.5
+    p        = (.5) * (1+alpha)
+    q        = (1 - beta)
+    F        = 0.5
 
     # put best row from last population matrix into new population and
     # randomly select new rows for 20% of new population
@@ -323,7 +343,7 @@ def findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
   
     num = int(numOfPop * 0.2)
     for i in range(num, numOfPop):
-        popI = getPopulationI(parentPop[i])
+        popI           = getPopulationI(parentPop[i])
         # find vector based on mutation and crossover of population row
         theRightVector = findTheRightVector(i, parentPop, fitness, \
                                  model, TrainX, TrainY, ValidateX, ValidateY )
@@ -357,19 +377,20 @@ def findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
             for j in range(numOfFea):
                 population[i][j] = V[j]
 
-
     return population
 
 #------------------------------------------------------
 def getParentPopulation(population):
-    numOfPop = population.shape[0]
-    numOfFea = population.shape[1]
-
-    parentPop = zeros((numOfPop, numOfFea))
-    for i in range(numOfPop):
-        for j in range(numOfFea):
-            parentPop[i][j]= population[i][j]
-    return parentPop
+    try:
+        numOfPop  = population.shape[0]
+        numOfFea  = population.shape[1]
+        parentPop = zeros((numOfPop, numOfFea))
+        for i in range(numOfPop):
+            for j in range(numOfFea):
+                parentPop[i][j]= population[i][j]
+        return parentPop;
+    except:
+        print "error getting parent population"
     
 #------------------------------------------------------
 def checkterTerminationStatus(Times, oldFitness, globalBestFitness):
@@ -389,7 +410,7 @@ def checkterTerminationStatus(Times, oldFitness, globalBestFitness):
 def IterateNtimes(start_time, model, fileW, fitness, velocity, population, parentPop,
                   localBestFitness,localBestMatrix, globalBestRow, \
                   globalBestFitness, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY):
-
+    '''Performing core BPSO functions'''
     numOfGenerations = 100
     alphaStarts = 0.5
     alphaEnds = 0.33
@@ -452,46 +473,53 @@ def IterateNtimes(start_time, model, fileW, fitness, velocity, population, paren
 
 #------------------------------------------------------
 def InitializeGlobalBestRow(populationRow):
-    numOfFea = populationRow.shape[0]
-    globalBestRow = zeros(numOfFea)
-    for j in range(numOfFea):
-        globalBestRow[j] = populationRow[j]
+    try:
+        numOfFea      = populationRow.shape[0]
+        globalBestRow = zeros(numOfFea)
+        for j in range(numOfFea):
+            globalBestRow[j] = populationRow[j]
 
-    return globalBestRow
+        return globalBestRow;
+    except:
+        print "error initializing global best row"
 
 #------------------------------------------------------
 # copy population matrix
 def CreateInitialLocalBestMatrix(population):
-    numOfPop = population.shape[0]
-    numOfFea = population.shape[1]
-    localBestMatrix = zeros((numOfPop, numOfFea))
-    for i in range(numOfPop):
-        for j in range(numOfFea):
-            localBestMatrix[i][j] = population[i][j]
-    return localBestMatrix
+    try:
+        numOfPop        = population.shape[0]
+        numOfFea        = population.shape[1]
+        localBestMatrix = zeros((numOfPop, numOfFea))
+        for i in range(numOfPop):
+            for j in range(numOfFea):
+                localBestMatrix[i][j] = population[i][j]
+        return localBestMatrix;
+    except:
+        print "error creating initial local best matrix."
 
 #------------------------------------------------------
 # copy fitness vector
 def CreateInitialLocalBestFitness(fitness):
-    numOfPop = fitness.shape[0]
-    localBestFitness = zeros(numOfPop)
-    for i in range(numOfPop):
-        localBestFitness[i] = fitness[i]
+    try:
+        numOfPop         = fitness.shape[0]
+        localBestFitness = zeros(numOfPop)
+        for i in range(numOfPop):
+            localBestFitness[i] = fitness[i]
     
-    return localBestFitness    
+        return localBestFitness;
+    except:
+        print "error creating initial local best fitness"
 
 #------------------------------------------------------
 #main program starts in here
 def main():
 
     begin_time = time.time()
-
-    fileW = createAnOutputFile()
-    model = ANN.ANN()
-
-    numOfPop = 4  # should be 50 population
-    numOfFea = 396  # should be 396 descriptors
-    unfit = 1000
+    fileW      = createAnOutputFile();
+    model      = ANN.ANN();
+    numOfPop   = 4  # should be 50 population
+    numOfFea   = 396  # should be 396 descriptors
+    unfit      = 1000
 
     # Final model requirements
     R2req_train    = .6
@@ -500,15 +528,14 @@ def main():
 
     # get training, validation, test data and rescale
     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
-    TrainX, ValidateX, TestX = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
+    TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
   
     load_time = time.time()
     print "Load and rescale data: {}".format((load_time - begin_time))
     
     # initial velocities, numbers between 0 and 1
-    velocity = createInitVelMat(numOfPop, numOfFea)
-
-    unfit = 1000
+    velocity      = createInitVelMat(numOfPop, numOfFea)
+    unfit         = 1000
     fittingStatus = unfit
   
     print "********** time is = ", time.strftime("%H:%M:%S", time.localtime())

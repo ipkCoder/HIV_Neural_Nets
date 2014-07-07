@@ -192,16 +192,13 @@ def rmse(X, Y):
 	-------
 	out : float64
 	"""
-
 	X = asarray(X, dtype=float64)
 	Y = asarray(Y, dtype=float64)
-	
 	return (sum((X-Y)**2)/len(X))**.5
 #------------------------------------------------------------------------------
 
 def cv_predict(set_x, set_y, val_x, val_y, model):
     """Predict using cross validation."""
-
     yhat = empty_like(set_y)
     for idx in range(0, yhat.shape[0]):
         train_x = delete(set_x, idx, axis=0)
@@ -222,7 +219,6 @@ def cv_predict(set_x, set_y, val_x, val_y, model):
 def calc_fitness(xi, Y, Yhat, c=2):
     """
     Calculate fitness of a prediction.
-    
     Parameters
     ----------
     xi : array_like -- Mask of features to measure fitness of. Must be of dtype bool.
@@ -234,12 +230,11 @@ def calc_fitness(xi, Y, Yhat, c=2):
     out: float -- Fitness for the given data.
     
     """
-    
 #    p = sum(populationRowI[xi])   # Number of selected parameters (sum value of indexes ????)
-    p = len(xi);
-    n = len(Y)    # Sample size
+    p     = len(xi);
+    n     = len(Y)    # Sample size
     numer = ((Y - Yhat)**2).sum()/n   # Mean square error
-    pcn = p*(c/n)
+    pcn   = p*(c/n)
     if pcn >= 1:
         return 1000
     denom = (1 - pcn)**2
@@ -311,13 +306,9 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
 
     # analyze one population row at a time
     for i in range(numOfPop):
-
         pop_time = time.time()
-
-        xi = OnlySelectTheOnesColumns(population[i])
-      
-        idx = hashlib.sha1(array(xi)).digest() # Hash
-      
+        xi       = OnlySelectTheOnesColumns(population[i])
+        idx      = hashlib.sha1(array(xi)).digest() # Hash
         if idx in trackFitness.keys():
             # don't recalculate everything if the model has already been validated
             fitness[i] = trackFitness[idx]
@@ -327,7 +318,6 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
         X_train_masked = TrainX.T[xi].T
         X_validation_masked = ValidateX.T[xi].T
         X_test_masked = TestX.T[xi].T
-  
         model.create_network(X_train_masked.shape[1])
 
         # print X_train_masked.shape
@@ -349,67 +339,58 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
 
         # Computed predicted values using computed y-int and slope 
         Yhat_cv = cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)    # Cross Validation
-        
         cv_time = time.time()
         print "Cross validate for {}: {}".format(i, (cv_time - model_time))
 
         Yhat_validation = model.predict(X_validation_masked)
-        Yhat_test = model.predict(X_test_masked)
+        Yhat_test       = model.predict(X_test_masked)
 
         # Compute R2 statistics (Prediction for Valiation and Test set)
-        q2_loo = r2(TrainY, Yhat_cv)
+        q2_loo            = r2(TrainY, Yhat_cv)
         r2pred_validation = r2Pred(TrainY, ValidateY, Yhat_validation)
-        r2pred_test = r2Pred(TrainY, TestY, Yhat_test)
-                      
-        Y_fitness = append(TrainY, ValidateY)
-        Yhat_fitness = append(Yhat_cv, Yhat_validation)
-
-        fitness[i] = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
+        r2pred_test       = r2Pred(TrainY, TestY, Yhat_test)
+        Y_fitness         = append(TrainY, ValidateY)
+        Yhat_fitness      = append(Yhat_cv, Yhat_validation)
+        fitness[i]        = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
         
         #print "predictive is: ", predictive
         if predictive and ((q2_loo < 0.5) or (r2pred_validation < 0.5) or (r2pred_test < 0.5)):
             # if it's not worth recording, just return the fitness
             print "ending the program because of predictive is: ", predictive
-            continue
+            continue;
             
         # Compute predicted Y_hat for training set.
         Yhat_train = model.predict(X_train_masked)
-        r2_train = r2(TrainY, Yhat_train)
+        r2_train   = r2(TrainY, Yhat_train)
    
         # Standard error of estimate
-        s = see(X_train_masked.shape[1], TrainY, Yhat_train)
+        s               = see(X_train_masked.shape[1], TrainY, Yhat_train)
         sdep_validation = sdep(ValidateY, Yhat_validation)
-        sdep_test = sdep(TrainY, Yhat_train)
-            
-        idxLength = len(xi)
+        sdep_test       = sdep(TrainY, Yhat_train)
+        idxLength       = len(xi)
 
         # store stats
-        trackDesc[idx] = str(xi)
-        trackIdx[idx] = idxLength
-        trackFitness[idx] = fitness[i]
-
-        trackModel[idx] = model_desc
-        
-        trackR2[idx] = r2_train
-        trackQ2[idx] = q2_loo
+        trackDesc[idx]             = str(xi)
+        trackIdx[idx]              = idxLength
+        trackFitness[idx]          = fitness[i]
+        trackModel[idx]            = model_desc
+        trackR2[idx]               = r2_train
+        trackQ2[idx]               = q2_loo
         trackR2PredValidation[idx] = r2pred_validation
-        trackR2PredTest[idx] = r2pred_test
-        trackSEETrain[idx] = s
-        trackSDEPValidation[idx] = sdep_validation
-        trackSDEPTest[idx] = sdep_test
-
-        yTrain[idx] = TrainY.tolist()
-        yHatTrain[idx] = Yhat_train.tolist()
-        yHatCV[idx] = Yhat_cv.tolist()
-        yValidation[idx] = ValidateY.tolist()
-        yHatValidation[idx] = Yhat_validation.tolist()
-        yTest[idx] = TestY.tolist()
-        yHatTest[idx] = Yhat_test.tolist()
+        trackR2PredTest[idx]       = r2pred_test
+        trackSEETrain[idx]         = s
+        trackSDEPValidation[idx]   = sdep_validation
+        trackSDEPTest[idx]         = sdep_test
+        yTrain[idx]                = TrainY.tolist()
+        yHatTrain[idx]             = Yhat_train.tolist()
+        yHatCV[idx]                = Yhat_cv.tolist()
+        yValidation[idx]           = ValidateY.tolist()
+        yHatValidation[idx]        = Yhat_validation.tolist()
+        yTest[idx]                 = TestY.tolist()
+        yHatTest[idx]              = Yhat_test.tolist()
 
         pop_end_time = time.time()
         print "Trained and found results for population {}: {}".format(i, (pop_end_time - pop_time))
-        
-        
     #printing the information into the file
 
     write(model,fileW, trackDesc, trackIdx, trackFitness, trackModel, trackR2,\
