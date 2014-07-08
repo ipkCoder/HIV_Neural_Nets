@@ -6,6 +6,7 @@ from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.tools.validation import Validator
 import numpy as np
+from qsarHelpers import *
 
 class ANN:
     
@@ -74,8 +75,11 @@ class ANN:
 
         # Backprop trainer object
         self.trainer = BackpropTrainer(self.ffn, learningrate=.0775, momentum=.1)
-
-        self.trainer.trainUntilConvergence(trainingData=self.train_ds, validationData=self.validate_ds, maxEpochs=500, continueEpochs=10)
+        try:
+            with Timer() as t:
+                self.trainer.trainUntilConvergence(trainingData=self.train_ds, validationData=self.validate_ds, maxEpochs=500, continueEpochs=10)
+        finally:
+            print("ANN.py - Time to trainUntilConvergence: {:.03f} sec.".format(t.interval))
 
         return 'ANN'
 

@@ -543,7 +543,7 @@ def main():
     ##################################################################
     while (fittingStatus == unfit):
       # create inititial population and find fitness for each row in population
-        population = createInitPopMat(numOfPop, numOfFea)
+        population             = createInitPopMat(numOfPop, numOfFea)
         fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(load_time, model,fileW, population, 
             TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
 

@@ -5,6 +5,7 @@ import csv
 import math
 import sys
 import hashlib
+from qsarHelpers import *
 
 #TODO: most of the time dealing with population is spent in cv_predict
 #      have to train number of models (one without each sample)
@@ -204,13 +205,13 @@ def cv_predict(set_x, set_y, val_x, val_y, model):
         train_x = delete(set_x, idx, axis=0)
         train_y = delete(set_y, idx, axis=0)
         try:
-            modelName = model.train(train_x, train_y, val_x, val_y)
-            yhat[idx] = model.predict(set_x[idx])
-            # end_time = time.time()
-            # print "Trained cv model {} in {} sec".format(idx, (start_time-end_time))
-            # start_time = end_time
+            with Timer() as t:
+                modelName = model.train(train_x, train_y, val_x, val_y)
+                yhat[idx] = model.predict(set_x[idx])
         except:
             print "Error with training cv model for sample {}".format(idx+1)
+        finally:
+            print("Trained cv model {} in {:.03f} sec.".format( idx,t.interval))
     return yhat
 
 #------------------------------------------------------------------------------
@@ -285,12 +286,11 @@ def OnlySelectTheOnesColumns(popI):
 #Ahmad Hadaegh: Modified  on: July 16, 2013
 def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
                    ValidateX, ValidateY, TestX, TestY):
-    
-    numOfPop = population.shape[0]
-    fitness = zeros(numOfPop)
-    c = 2
-    false = 0
-    true = 1
+    numOfPop   = population.shape[0]
+    fitness    = zeros(numOfPop)
+    c          = 2
+    false      = 0
+    true       = 1
     predictive = false
   
     # create empty dictionaries to hold data
@@ -300,9 +300,8 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
 
     yTrain, yHatTrain, yHatCV, yValidation, \
     yHatValidation, yTest, yHatTest = initializeYDimension()
-
-    unfit = 1000
-    itFits = 1
+    unfit                           = 1000
+    itFits                          = 1
 
     # analyze one population row at a time
     for i in range(numOfPop):
@@ -315,9 +314,9 @@ def validate_model(start_time, model, fileW, population, TrainX, TrainY,\
             continue
       
         # get columns that have been selected for evaluation
-        X_train_masked = TrainX.T[xi].T
+        X_train_masked      = TrainX.T[xi].T
         X_validation_masked = ValidateX.T[xi].T
-        X_test_masked = TestX.T[xi].T
+        X_test_masked       = TestX.T[xi].T
         model.create_network(X_train_masked.shape[1])
 
         # print X_train_masked.shape
