@@ -12,6 +12,20 @@ import csv
 from collections import namedtuple
 import os
 import datetime
+import time
+
+class Timer:
+    '''
+        Timer utility class
+        reference : http://preshing.com/20110924/timing-your-code-using-pythons-with-statement/
+    '''
+    def __enter__(self):
+        self.start = time.clock()
+        return self;
+
+    def __exit__(self, *args):
+        self.end      = time.clock()
+        self.interval = self.end - self.start;
 
 # Since we can't declare constants in Python, so we use a namedtuple
 # to define immutable index value(s) for log entry types.  A namedtuple
