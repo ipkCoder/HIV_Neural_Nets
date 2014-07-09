@@ -85,7 +85,6 @@ class ANN:
 
     # predict depenent variable for dataset
     def predict(self, data):
-
         # if only make prediction for one sample
         if(len(data.shape) == 1):
             return self.ffn.activate(data)

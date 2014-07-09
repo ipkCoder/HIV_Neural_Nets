@@ -1,9 +1,9 @@
 import time                 # provides timing for benchmarks
 from numpy  import *        # provides complex math and array functions
-#from sklearn import svm	    # provides Support Vector Regression
 import csv
 import math
 import sys
+from qsarHelpers import Timer
 
 #Local files created by me
 import ANN
@@ -410,67 +410,60 @@ def checkterTerminationStatus(Times, oldFitness, globalBestFitness):
 def IterateNtimes(start_time, model, fileW, fitness, velocity, population, parentPop,
                   localBestFitness,localBestMatrix, globalBestRow, \
                   globalBestFitness, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY):
-    '''Performing core BPSO functions'''
+    '''Performs core BPSO functions'''
     numOfGenerations = 100
-    alphaStarts = 0.5
-    alphaEnds = 0.33
-    
-    betaStarts = 0
-    betaEnds = 0.05
-
-    beta = betaStarts
-    alpha = alphaStarts
-    alphaDecre = (alphaStarts - alphaEnds) / numOfGenerations
-    betaIncre = (betaEnds - betaStarts)/numOfGenerations
-
-    oldFitness = globalBestFitness
-    Times = 0
+    alphaStarts      = 0.5
+    alphaEnds        = 0.33
+    betaStarts       = 0
+    betaEnds         = 0.05
+    beta             = betaStarts
+    alpha            = alphaStarts
+    alphaDecre       = (alphaStarts - alphaEnds) / numOfGenerations
+    betaIncre        = (betaEnds - betaStarts)/numOfGenerations
+    oldFitness       = globalBestFitness
+    Times            = 0
     #############################################################
     # loop for n generations
     for i in range(numOfGenerations):
-      
-        generation_start_time = time.time()
-        # terminate if golbalBestFitness hasn't changed in 30 generations
-        oldFitness, Times = checkterTerminationStatus(Times, oldFitness, globalBestFitness)
-      
-        print "This is iteration ", i, "Fitness is: ", globalBestFitness
-      
-        unfit = 1000
-        fittingStatus = unfit
-        # find new population matrix and fitness vector
-        while (fittingStatus == unfit):
-            new_pop_time = time.time()
-            population = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
-                        population,localBestMatrix, globalBestRow, \
-                        TrainX, TrainY, ValidateX, ValidateY)
-            print "Found new pop: {} min".format(((time.time() - new_pop_time)/60))
-            start_val_model = time.time()
-            fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(start_val_model, model,fileW, \
-                        population, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
-            print "Validated model: {} min".format(((time.time() - start_val_model)/60))
-      
-        #remember current population matrix
-        parentPop = getParentPopulation(population)
-  
-        # find new global best row and fitness
-        globalBestRow, globalBestFitness = findGlobalBest(population, fitness, globalBestRow, globalBestFitness)
-  
-        # if current population has lower fitness associated with it than
-        # local best matrix, remember current population as local best matrix
-        localBestFitness, localBestMatrix = findLocalBestMatrix(population, fitness, localBestFitness, localBestMatrix)
-  
-        # update velocities
-        velocity = findVelocity(velocity, population, localBestMatrix, globalBestRow, globalBestFitness)
-  
-        # update alpha and beta
-        alpha = alpha - alphaDecre
-        beta = beta + betaIncre
-
-        end_time = time.time()
-        print "Generation {} complete: {} min".format(i, ((end_time - generation_start_time)/60))
-        
+        try:
+            with Timer() as t0:
+                generation_start_time = time.time()
+                # terminate if golbalBestFitness hasn't changed in 30 generations
+                oldFitness, Times = checkterTerminationStatus(Times, oldFitness, globalBestFitness)
+                print "This is iteration {}, Fitness is: ".format(i,globalBestFitness); 
+                unfit         = 1000
+                fittingStatus = unfit
+                # find new population matrix and fitness vector
+                while (fittingStatus == unfit):
+                    try:
+                        with Timer() as t1:
+                            population   = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
+                                        population,localBestMatrix, globalBestRow, \
+                                        TrainX, TrainY, ValidateX, ValidateY)
+                    finally:
+                        print "New pop found in {} min".format((t1.interval/60))
+            
+                    try:
+                        with Timer() as t1:
+                            fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(model,fileW, \
+                                        population, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
+                    finally:
+                        print "Validated model in {} min".format((t1.interval/60))      
+                #remember current population matrix
+                parentPop                         = getParentPopulation(population)
+                # find new global best row and fitness
+                globalBestRow, globalBestFitness  = findGlobalBest(population, fitness, globalBestRow, globalBestFitness)
+                # if current population has lower fitness associated with it than
+                # local best matrix, remember current population as local best matrix
+                localBestFitness, localBestMatrix = findLocalBestMatrix(population, fitness, localBestFitness, localBestMatrix)
+                # update velocities
+                velocity                          = findVelocity(velocity, population, localBestMatrix, globalBestRow, globalBestFitness)
+                alpha                             = alpha - alphaDecre
+                beta                              = beta + betaIncre
+                end_time                          = time.time()
+        finally:
+            print "Generation {} complete: {} min".format(i, (t.interval/60))
     return
-
 #------------------------------------------------------
 def InitializeGlobalBestRow(populationRow):
     try:
@@ -511,72 +504,59 @@ def CreateInitialLocalBestFitness(fitness):
         print "error creating initial local best fitness"
 
 #------------------------------------------------------
-#main program starts in here
 def main():
-
-    begin_time = time.time()
-    fileW      = createAnOutputFile();
-    model      = ANN.ANN();
-    numOfPop   = 4  # should be 50 population
-    numOfFea   = 396  # should be 396 descriptors
-    unfit      = 1000
-
-    # Final model requirements
-    R2req_train    = .6
-    R2req_validate = .5
-    R2req_test     = .5
-
-    # get training, validation, test data and rescale
-    TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
-    TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
-  
-    load_time = time.time()
-    print "Load and rescale data: {}".format((load_time - begin_time))
+    print "********** start time is = ", time.strftime("%H:%M:%S", time.localtime())
+    try:
+        with Timer() as t:
+            fileW      = createAnOutputFile();
+            model      = ANN.ANN();
+            numOfPop   = 4  # should be 50 population
+            numOfFea   = 396  # should be 396 descriptors
+            unfit      = 1000
+            # Final model requirements
+            R2req_train    = .6
+            R2req_validate = .5
+            R2req_test     = .5
+            # get training, validation, test data and rescale
+            TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
+            TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
+    finally:
+        print( "Time to load and rescale data: {:.03f} sec".format(t.interval) )
     
     # initial velocities, numbers between 0 and 1
     velocity      = createInitVelMat(numOfPop, numOfFea)
     unfit         = 1000
     fittingStatus = unfit
-  
-    print "********** time is = ", time.strftime("%H:%M:%S", time.localtime())
+    try:
+        with Timer() as t:
+            while (fittingStatus == unfit):
+                # create inititial population and find fitness for each row in population
+                population             = createInitPopMat(numOfPop, numOfFea)
+                fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(model,fileW, population, 
+                    TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
+    finally:
+        print "Validated model: {} min".format((t.interval/60))
 
-    ##################################################################
-    while (fittingStatus == unfit):
-      # create inititial population and find fitness for each row in population
-        population             = createInitPopMat(numOfPop, numOfFea)
-        fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(load_time, model,fileW, population, 
-            TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
+    try:
+        with Timer() as t:
+            # initialize global best row and fitness to first population row
+            globalBestRow                    = InitializeGlobalBestRow(population[0])
+            globalBestFitness                = fitness[0]
+            # find actual global best row and fitness
+            globalBestRow, globalBestFitness = findGlobalBest(population,fitness, globalBestRow,globalBestFitness)
+            # initialze local best matrix (Pid) with current population matirix
+            # initialize local best fitness with current fitness vector
+            localBestMatrix                  = CreateInitialLocalBestMatrix(population)
+            localBestFitness                 = CreateInitialLocalBestFitness(fitness)
+            # parent population is current population
+            parentPop = getParentPopulation(population)
+    finally:
+        print( "Time to initialize data: {:.03f} sec".format(t.interval) )
 
-    end_time = time.time()
-    print "Validated model: {} min".format(((end_time - load_time)/60))
-
-    # initialize global best row and fitness to first population row
-    globalBestRow = InitializeGlobalBestRow(population[0])
-    globalBestFitness = fitness[0]
-    
-    # find actual global best row and fitness
-    globalBestRow, globalBestFitness = findGlobalBest(population,fitness, globalBestRow,globalBestFitness)
-    
-    # initialze local best matrix (Pid) with current population matirix
-    # initialize local best fitness with current fitness vector
-    localBestMatrix = CreateInitialLocalBestMatrix(population)
-    localBestFitness = CreateInitialLocalBestFitness(fitness)
-    
-    # parent population is current population
-    parentPop = getParentPopulation(population)
-
-    iter_N_time = time.time()
-    print "Initialize local/global best population: {} sec".format((iter_N_time - end_time))
-
-    print "Starting the Loop - time is = ", time.strftime("%H:%M:%S", time.localtime())
-    
+    print "Starting iteration loop at ", time.strftime("%H:%M:%S", time.localtime())
     IterateNtimes(iter_N_time, model, fileW, fitness, velocity, population, parentPop,
                   localBestFitness,localBestMatrix, globalBestRow,
                   globalBestFitness, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
 #------------------------------------------------------    
-
+#main program starts in here
 main()
-       
-#main program ends in here
-
-#------------------------------------------------------
