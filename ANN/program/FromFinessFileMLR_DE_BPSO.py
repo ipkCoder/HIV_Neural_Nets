@@ -1,6 +1,6 @@
 import time                 # provides timing for benchmarks
 from numpy   import *        # provides complex math and array functions
-#from sklearn import svm	    # provides Support Vector Regression
+#from sklearn import svm        # provides Support Vector Regression
 import csv
 import math
 import sys
@@ -11,9 +11,16 @@ from qsarHelpers import *
 #      have to train number of models (one without each sample)
 #      dealing with one population member takes about five minutes
 #      about 95% of this time is spent in cv_predict
-#      seems like we should be able to use CUDA for parallel programming 
+#      seems like we should be able to use CUDA for parallel programming
+
+#Question: pyBrain trainUntilConvergence trains until validation error starts to rise
+#          For cv_predict, is this a problem?
+#          Should training not depend on validation data?
+#          I am still thinking about this
 
 #------------------------------------------------------------------------------
+
+
 def r2(y, yHat):
     """Coefficient of determination"""
     numer = ((y - yHat)**2).sum()       # Residual Sum of Squares
@@ -21,12 +28,15 @@ def r2(y, yHat):
     r2 = 1 - numer/denom
     return r2
 #------------------------------------------------------------------------------
+
 def r2Pred(yTrain, yTest, yHatTest):
     numer = ((yHatTest - yTest)**2).sum()
     denom = ((yTest - yTrain.mean())**2).sum()
     r2Pred = 1 - numer/denom
     return r2Pred
+
 #------------------------------------------------------------------------------
+
 def see(p, y, yHat):
     """
     Standard error of estimate
@@ -43,6 +53,7 @@ def see(p, y, yHat):
         s = (numer/denom)** 0.5
     return s
 #------------------------------------------------------------------------------
+
 def sdep(y, yHat):
     """
     Standard deviation of error of prediction
@@ -56,6 +67,8 @@ def sdep(y, yHat):
 
     return sdep
 #------------------------------------------------------------------------------
+
+
 def ccc(y, yHat):
     """Concordance Correlation Coefficient"""
     n = y.shape[0]
@@ -63,7 +76,9 @@ def ccc(y, yHat):
     denom = ((y - y.mean())**2).sum() + ((yHat - yHat.mean())**2).sum() + n*((y.mean() - yHat.mean())**2)
     ccc = numer/denom
     return ccc
+
 #------------------------------------------------------------------------------
+
 def ccc_adj(ccc, n, p):
 
     """
@@ -76,19 +91,24 @@ def ccc_adj(ccc, n, p):
     """
     ccc_adj = ((n - 1)*ccc - p)/(n - p - 1)
     return ccc_adj
+
 #------------------------------------------------------------------------------
+
 def q2F3(yTrain, yTest, yHatTest):
     numer = (((yTest - yHatTest)**2).sum())/yTest.shape[0]
     denom = (((yTrain - yTrain.mean())**2).sum())/yTrain.shape[0]
     q2F3 = 1 - numer/denom
     return q2F3
 #------------------------------------------------------------------------------
+
 def k(y, yHat):
     """Compute slopes"""
     k = ((y*yHat).sum())/((yHat**2).sum())
     kP = ((y*yHat).sum())/((y**2).sum())
     return k, kP
+
 #------------------------------------------------------------------------------
+
 def r0(y, yHat, k, kP):
     """
     Compute correlation for regression lines through the origin
@@ -105,12 +125,16 @@ def r0(y, yHat, k, kP):
     denom = ((y - y.mean())**2).sum()
     rP2_0 = 1 - numer/denom
     return r2_0, rP2_0
+
 #------------------------------------------------------------------------------
+
 def r2m(r2, r20):
     """Roy Validation Metrics"""
     r2m = r2*(1 - (r2 - r20)**0.5)
     return r2m
+
 #------------------------------------------------------------------------------
+
 def r2m_adj(r2m, n, p):
 
     """
@@ -123,7 +147,9 @@ def r2m_adj(r2m, n, p):
     """
     r2m_adj = ((n - 1)*r2m - p)/(n - p - 1)
     return r2m_adj
+
 #------------------------------------------------------------------------------
+
 def r2p(r2, r2r):
     """
     Parameters
@@ -133,47 +159,71 @@ def r2p(r2, r2r):
     """
     r2p = r2*((r2 - r2r)**0.5)
     return r2p
+
 #------------------------------------------------------------------------------
+
 def rSquared(y, yPred):
-	"""Find the coefficient  of correlation for an actual and predicted set.
-	
-	Parameters
-	----------
-	y : 1D array -- Actual values.
-	yPred : 1D array -- Predicted values.
-	
-	Returns 
-	-------
-	out : float -- Coefficient  of correlation.
-	
-	"""
+    """Find the coefficient  of correlation for an actual and predicted set.
+    
+    Parameters
+    ----------
+    y : 1D array -- Actual values.
+    yPred : 1D array -- Predicted values.
+    
+    Returns 
+    -------
+    out : float -- Coefficient  of correlation.
+    
+    """
 
-	rss = ((y - yPred)**2).sum()   # Residual Sum of Squares
-	sst = ((y - y.mean())**2).sum()   # Total Sum of Squares
-	r2 = 1 - (rss/sst)
+    rss = ((y - yPred)**2).sum()   # Residual Sum of Squares
+    sst = ((y - y.mean())**2).sum()   # Total Sum of Squares
+    r2 = 1 - (rss/sst)
 
-	return r2
+    return r2
+
 #------------------------------------------------------------------------------
+
 def rmse(X, Y):
-	"""
-	Calculate the root-mean-square error (RMSE) also known as root mean
-	square deviation (RMSD).
-	
-	Parameters
-	----------
-	X : array_like -- Assumed to be 1D.
-	Y : array_like -- Assumed to be the same shape as X.
-	
-	Returns
-	-------
-	out : float64
-	"""
-	X = asarray(X, dtype=float64)
-	Y = asarray(Y, dtype=float64)
-	return (sum((X-Y)**2)/len(X))**.5
+    """
+    Calculate the root-mean-square error (RMSE) also known as root mean
+    square deviation (RMSD).
+    
+    Parameters
+    ----------
+    X : array_like -- Assumed to be 1D.
+    Y : array_like -- Assumed to be the same shape as X.
+    
+    Returns
+    -------
+    out : float64
+    """
+    X = asarray(X, dtype=float64)
+    Y = asarray(Y, dtype=float64)
+    return (sum((X-Y)**2)/len(X))**.5
 #------------------------------------------------------------------------------
+"""
+    Purpose: - cross validate training data
+             - for each sample, train model without that sample, then predict target for that sample
+    
+    @param set_x: feature set for training set data
+    @param set_y: target values for training set data
+    @param val_x: feature set for validation set data
+    @param val_y: target values for validation set data
+
+    @variable yhat: array to hold predicted values for each training sample (size same as set_x)
+    @variable train_x: training set without sample to predict
+    @variable train_y: target values for training set without target value for sample to predict
+    @variable model_name: name of model used to predict values
+    @variable idx: index of sample/target value to drop from set_x/set_y
+
+    note: val_x and val_y are used in training model because pyBrain requires validation data
+"""
 def cv_predict(set_x, set_y, val_x, val_y, model):
     """Predict using cross validation."""
+    
+    print "Models to train: {}".format(set_x.shape[0])
+
     yhat = empty_like(set_y)
     for idx in range(0, yhat.shape[0]):
         train_x = delete(set_x, idx, axis=0)
@@ -183,7 +233,7 @@ def cv_predict(set_x, set_y, val_x, val_y, model):
                 modelName = model.train(train_x, train_y, val_x, val_y)
                 yhat[idx] = model.predict(set_x[idx])
         except:
-            print "Error with training cv model for sample {}".format(idx+1)
+            print "Error with training cv model for sample {}".format(idx)
         finally:
             print("Trained cv model {} in {:.03f} sec.".format( idx,t.interval))
     return yhat
