@@ -206,9 +206,9 @@ def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
     fitnessV = findFitnessOfARow(model, V, TrainX, TrainY, ValidateX, ValidateY)
     
     if (fitnessU < fitnessV):
-        return U
+        return U, fitnessU
     else:
-        return V
+        return V, fitnessV
     
 #------------------------------------------------------
 def mutate(V1, V2, V3):
@@ -256,6 +256,11 @@ def selectThreeRandomRows(parentPop):
     return V1, V2, V3;
 
 #------------------------------------------------------
+
+# P = individual i from parent population
+# V = new individual created from function of three random individuals
+# U = individual created from P and V, OR V (whichever has better fitness)
+
 def findTheRightVector(rowI, parentPop, fitness, model, \
                        TrainX, TrainY, ValidateX, ValidateY):
     '''This is the mutation function'''
@@ -263,21 +268,19 @@ def findTheRightVector(rowI, parentPop, fitness, model, \
     numOfFea = parentPop.shape[1]
     P        = zeros(numOfFea)
     U        = zeros(numOfFea)
-
+    fitnessP = fitness[rowI]
+    fitnessU = 0
+    
     # P is same as parent row i
     for j in range(numOfFea):
        P[j] = parentPop[rowI][j]
   
     # find new row combination by using mutation function on three randowm rows and using cross over function, if new row has lower fitness return new row, else return old row
     while (U.sum() < 3):
-        V1, V2, V3 = selectThreeRandomRows(parentPop)
-        V          = mutate(V1, V2, V3)
-        U          = crossover(P, V, model,TrainX, TrainY, ValidateX, ValidateY)
-        print "Descriptors in U: {}".format(U.sum())
+        V1, V2, V3   = selectThreeRandomRows(parentPop)
+        V            = mutate(V1, V2, V3)
+        U, fitnessU  = crossover(P, V, model,TrainX, TrainY, ValidateX, ValidateY)
   
-    fitnessP = fitness[rowI]
-    fitnessU = findFitnessOfARow(model, U, TrainX, TrainY, ValidateX, ValidateY)
-
     if (fitnessU < fitnessP):
         return U
     else:
@@ -306,6 +309,7 @@ def getTheBestRowAndThreeRandomRows(fitness, parentPop):
     numOfFea = parentPop.shape[1]
 
     population = zeros((numOfPop, numOfFea))
+    
     # The following moves the best row from the parent population 
     # and move it to be the first row of the current population
     V = theVecWithMinFitness(fitness, parentPop)
@@ -407,7 +411,7 @@ def checkterTerminationStatus(Times, oldFitness, globalBestFitness):
     return oldFitness, Times
 
 #------------------------------------------------------
-def IterateNtimes(start_time, model, fileW, fitness, velocity, population, parentPop,
+def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                   localBestFitness,localBestMatrix, globalBestRow, \
                   globalBestFitness, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY):
     '''Performs core BPSO functions'''
@@ -427,17 +431,17 @@ def IterateNtimes(start_time, model, fileW, fitness, velocity, population, paren
     for i in range(numOfGenerations):
         try:
             with Timer() as t0:
-                generation_start_time = time.time()
+
                 # terminate if golbalBestFitness hasn't changed in 30 generations
                 oldFitness, Times = checkterTerminationStatus(Times, oldFitness, globalBestFitness)
-                print "This is iteration {}, Fitness is: ".format(i,globalBestFitness); 
+                print "This is iteration {}, Fitness is: {}".format(i,globalBestFitness); 
                 unfit         = 1000
                 fittingStatus = unfit
                 # find new population matrix and fitness vector
                 while (fittingStatus == unfit):
                     try:
                         with Timer() as t1:
-                            population   = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
+                            population = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
                                         population,localBestMatrix, globalBestRow, \
                                         TrainX, TrainY, ValidateX, ValidateY)
                     finally:
@@ -554,7 +558,7 @@ def main():
         print( "Time to initialize data: {:.03f} sec".format(t.interval) )
 
     print "Starting iteration loop at ", time.strftime("%H:%M:%S", time.localtime())
-    IterateNtimes(iter_N_time, model, fileW, fitness, velocity, population, parentPop,
+    IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                   localBestFitness,localBestMatrix, globalBestRow,
                   globalBestFitness, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
 #------------------------------------------------------    
