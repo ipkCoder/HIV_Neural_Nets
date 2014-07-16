@@ -293,14 +293,12 @@ def initializeYDimension():
     return yTrain, yHatTrain, yHatCV, yValidation, yHatValidation, yTest, yHatTest 
 #------------------------------------------------------------------------------
 def OnlySelectTheOnesColumns(popI):
-    numOfFea = popI.shape[0]
-    xi = zeros(numOfFea)
-    for j in range(numOfFea):
-       xi[j] = popI[j]
+    
+    indicies_of_non_zeros = popI.nonzero()[0]
+    indicies_of_non_zeros.tolist()
 
-    xi = xi.nonzero()[0]
-    xi = xi.tolist()
-    return xi
+    return indicies_of_non_zeros
+
 #------------------------------------------------------------------------------
 #Ahmad Hadaegh: Modified  on: July 16, 2013
 def validate_model(model, fileW, population, TrainX, TrainY,\
