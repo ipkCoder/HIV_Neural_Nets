@@ -466,7 +466,7 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                 beta                              = beta + betaIncre
                 end_time                          = time.time()
         finally:
-            print "Generation {} complete: {} min".format(i, (t.interval/60))
+            print "Generation {} complete: {} min".format(i, (t0.interval/60))
     return
 #------------------------------------------------------
 def InitializeGlobalBestRow(populationRow):
