@@ -10,7 +10,7 @@
 #-------------------------------------------------------------------------------
 import numpy as np
 import math
-
+from ImportData import *
 
 # ======= Regarding first TODO ===============
 # what do you mean by map input layer to pattern layer?
@@ -173,7 +173,12 @@ def getCosts(X,y,sigma):
 # main function
 def main():
   try:
-    # unlabeled training set (X) to classify
+    
+	data, targets = getAllOfTheData()
+
+	sample_size, feature_size = data.shape
+
+	# unlabeled training set (X) to classify
     X = np.array([[1.0,2.0,3.0,4.0,5.0],
                   [1.0,1.0,1.0,1.0,1.0],
                   [2.0,3.0,1.5,2.0,1.9],
@@ -183,7 +188,7 @@ def main():
     y = np.array([6.0,1.3,2.4,1.8,2.2]);
     
     # array to hold predicted values
-    yHat = np.zeros(y.shape[0]);
+    yHat = np.zeros(sample_size);
     
     # Multiple-sigma model, one weight per descriptor
     sigmas     = np.arange(1.0,6.0);
