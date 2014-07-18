@@ -219,12 +219,14 @@ def rmse(X, Y):
 
     note: val_x and val_y are used in training model because pyBrain requires validation data
 """
+
 def cv_predict(set_x, set_y, val_x, val_y, model):
     """Predict using cross validation."""
     
     print "Models to train: {}".format(set_x.shape[0])
 
     yhat = empty_like(set_y)
+    
     for idx in range(0, yhat.shape[0]):
         train_x = delete(set_x, idx, axis=0)
         train_y = delete(set_y, idx, axis=0)
@@ -235,7 +237,7 @@ def cv_predict(set_x, set_y, val_x, val_y, model):
         except:
             print "Error with training cv model for sample {}".format(idx)
         finally:
-            print("Trained cv model {} in {:.03f} sec.".format( idx,t.interval))
+            print("Trained cv individual {} in cv_predict: {:.03f} sec.".format( idx,t.interval))
     return yhat
 #------------------------------------------------------------------------------
 #Ahmad Hadaegh: Modified  on: July 16, 2013
@@ -253,7 +255,7 @@ def calc_fitness(xi, Y, Yhat, c=2):
     out: float -- Fitness for the given data.
     
     """
-#    p = sum(populationRowI[xi])   # Number of selected parameters (sum value of indexes ????)
+
     p     = len(xi);
     n     = len(Y)    # Sample size
     numer = ((Y - Yhat)**2).sum()/n   # Mean square error
@@ -336,14 +338,9 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
                     X_train_masked      = TrainX.T[xi].T
                     X_validation_masked = ValidateX.T[xi].T
                     X_test_masked       = TestX.T[xi].T
+
                     model.create_network(X_train_masked.shape[1])
-                    # print X_train_masked.shape
-                    # print TrainY.shape
-                    # print X_validation_masked.shape
-                    # print ValidateY.shape
-                    # print len(model.get_params())
                     model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
-                    # print "finished training"
             except:
                 print "failed to train"
                 error = True

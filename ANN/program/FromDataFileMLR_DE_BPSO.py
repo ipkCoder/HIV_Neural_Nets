@@ -6,10 +6,6 @@ import math
 import sys
 import os
 
-script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
-rel_path = "2091/data.txt"
-abs_file_path = os.path.join(script_dir, rel_path)
-
 #------------------------------------------------------------------------------
 def getTwoDecPoint(x):
     return float("%.2f"%x);

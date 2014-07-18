@@ -5,6 +5,7 @@ from pybrain.structure import BiasUnit
 from pybrain.datasets import SupervisedDataSet
 from pybrain.supervised.trainers import BackpropTrainer
 from pybrain.tools.validation import Validator
+
 import numpy as np
 from qsarHelpers import *
 
@@ -20,7 +21,7 @@ class ANN:
     def create_network(self, nFeatures, hidden1Size=20, nClasses=1):
         # create network object
         self.ffn = FeedForwardNetwork()
-            
+
         # create layer objects
         inLayer = LinearLayer(nFeatures, name="input")
         hiddenLayer = SigmoidLayer(hidden1Size, name="hidden1")
@@ -62,7 +63,6 @@ class ANN:
         self.train_ds.clear()
         self.validate_ds.clear()
 
-
         # add data to dataset object (ds)
         for i in range(TrainX.shape[0]):
             self.train_ds.addSample(TrainX[i], TrainY[i])
@@ -78,6 +78,8 @@ class ANN:
         try:
             with Timer() as t:
                 self.trainer.trainUntilConvergence(trainingData=self.train_ds, validationData=self.validate_ds, maxEpochs=500, continueEpochs=10)
+        except:
+            print "Error occured while training model in ANN."
         finally:
             print("ANN.py - Time to trainUntilConvergence: {:.03f} sec.".format(t.interval))
 
