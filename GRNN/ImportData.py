@@ -31,3 +31,16 @@ def getAllOfTheData():
     except:
         print "error getting all of data"
     return data, targets
+
+def rescaleTheData(data):
+    try:
+        # 1 degree of freedom means (ddof) N-1 unbiased estimation
+        dataVar = data.var(axis = 0, ddof=1)
+        dataMean = data.mean(axis = 0)
+
+        for i in range(data.shape[0]):
+            data[i,:] = (data[i,:] - dataMean)/np.sqrt(dataVar)
+
+        return data
+    except:
+        print "error rescaling the data"
