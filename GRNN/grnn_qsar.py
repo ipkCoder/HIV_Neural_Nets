@@ -13,68 +13,39 @@ import math
 from ImportData import *
 import sys
 
-# ======= Regarding first TODO ===============
-# what do you mean by map input layer to pattern layer?
-# each training sample does not get its own sigma values
-# R: Hi Ian, I'm just trying to understand how data passes from "input" layer(s)
-# to the "pattern" layer(s).  I'm going off the Fig. 3 from the paper.
-# I guess what I'm not completely understanding is how the "sigma" weight(s) vector is applied
-# to the training sample(s) in the "input" layer stage.
-# Ian: In the input layer, nothing is done to the features, they just enter the network
-# similar to ANN
+# ======= Regarding TODOs ===============
 
-# we really dont need to keep track of best and work y-hat
-# I dont remember why i did that, I think just to see if at end best was better
-# R: We can remove these if not needed, I hadn't gotten that far in revising the code
-# so I left those variables as-is since I wan't sure if they were relevant.
 
-# for cost function
-#   - are you wanting to calculate cost of each sample one at a time (through function getE)?
-# R: cost function is not being utilized at this point, but yes the intention is that 
-# we would be using this to identify the error, i.e. cost of misclassifying a
-# training sample instance.
+# =========== Notes =====================
 
-#activation function should include exp(-D)
-#not understanding input layer/input matrix
-# R: this ties in to my attempt to understand how the input layer => pattern layer works.
-# My thinking was that each "pattern" node gets a reference too all the training samples, including
-# the feature / sigma weight pairs.
+# Prediction of target values are prefect, need to figure out why
+# When change sigmas to a different range, numerators and denominators adjust
+# Even with different sigmas, predictions remain perfect
 
-# Ian: all nodes in the pattern layer do not get a reference to all training sample data.
-# Each node in the pattern layer contains the features for one sample (the number of nodes
-# in the patern layer is equal to the number of samples). Each node in the pattern layer computes
-# the squared weighted euclidean distance between the input layer sample and the sample in the node
-# and the activation function value. 
+# =======================================
+# 
+# Purpose: find weighted euclidean distance between all samples
 
-# outputLayer function only returns one y-hat (for example idx)
-# y should be y[x_i] in function getCosts
-# need to randomly initialize sigmas
-# ================================================================================
+# @param x1 - x sample vector for which to compute predicted value
+# @param x2 - other x sample in dataset
+# @paramsigma - vector of weights (each weight corresponds to specific feature)
+# @return distance - squared weighted euclidean distance (single value)
 
-# x1 - x sample vector for which to compute predicted value
-# x2 - other x sample in dataset
-# sigma - vector of weights (each weight corresponds to specific feature)
-# return D - squared weighted euclidean distance (single value)
-
-# TODO: make sure sigma isn't zero, if is, ???
-def weightedEuclideanDistance(x1, x2, sigma):
-    '''Get the squared weighted Euclidean distance between vector x1 and x2'''
-    #print len(x1)
-    #print len(x2)
-    #print len(sigmq)
-    
+def squareWeightedEuclideanDistance(x1, x2, sigma):
+    '''Get the squared weighted Euclidean distance between all samples'''
+    # should assert that x1, x2, sigma of are same length
     try:
         squared_weighted_dist = ((x1-x2)/sigma)**2
 #        print squared_weighted_dist
+        # if one of distances between features was divided by 0, set to big number
         squared_weighted_dist[squared_weighted_dist == np.inf] = 10000000
-#        print squared_weighted_dist[squared_weighted_dist == 1000000]
         distance = sum(squared_weighted_dist)
         return distance;
     except:
         print "Error calculating squared weighted Euclidean Distance"
 
 # compute disctances between all samples in dataset
-# @local euclidean_distance - type matrix
+# @local euclidean_distance - (matrix)
 #   - euclidean_distance[i][j] : square weighted euclidean distance between sample_i and sample_j
 def computeDistances(data, sigma):
 
@@ -84,12 +55,8 @@ def computeDistances(data, sigma):
 
     for i in range(sample_size):
         for j in range(sample_size):
-#           print i, j
-#           sys.stdout.flush()
             try:
-                euclidean_distance[i][j] = weightedEuclideanDistance(data[i], data[j], sigma)
-#                if euclidean_distance[i][j] == 0:
-#                    print i, j
+                euclidean_distance[i][j] = squareWeightedEuclideanDistance(data[i], data[j], sigma)
             except:
                 print("error calculating distances between {0} and {1}".format(i, j))
 
@@ -102,6 +69,9 @@ def computeDistances(data, sigma):
 
 def getSummationLayerNumerator(y, distance):
     '''Get the summation layer numerator (see eq.6 / 11)'''
+    
+    assert len(y) == len(distance), "Number of y values should equal number of samples"
+
     try:
         # multiply y vector along x axis
         numerator = sum(y * np.exp(-distance).T)
@@ -111,7 +81,8 @@ def getSummationLayerNumerator(y, distance):
 # ================================================================================
 
 # @param distance - (matrix) squared weighted euclidean distance between samples
-# @return           (vector) denominator of predicted y values
+# @return         - (vector) denominator of predicted y values
+#                 - for each y, predicted y is weighted sum of all ys
 
 def getSummationLayerDenominator(distance):
     '''Get the summation layer denominator (see eq.6 / 11)'''
@@ -127,7 +98,8 @@ def getSummationLayerDenominator(distance):
 def outputLayer(numerator, denominator):
     '''Divide numerator and denominator from summation layer'''
     try:
-        return numerator/denominator
+        yHat = numerator/denominator
+        return yHat
     except:
         print "Error predicting Y-hats in summation layer";
 # ================================================================================
@@ -135,10 +107,7 @@ def outputLayer(numerator, denominator):
 # y - is y a vector or single value?
 # you convert out to a float twice (reason?)
 # R: "y" is meant to be a vector in this context, this code was part of another function previously
-# I just rolled it up into a standalone function. No need for the float
-# good catch.  Note, if you see an obvious mistake, feel free to update the source, that's
-# the idea behind collaborative revision control.  Contributing includes
-# making adding / removing / updating the source.
+
 def getE(idx, X, y, sigma):
   '''Cost function component'''
   try:
@@ -191,7 +160,7 @@ def main():
     print(sample_size, feature_size)
 
     # set initial sigmas
-    sigmas = np.random.randint(100, 1000, feature_size)
+    sigmas = np.random.randint(1000, 50000, feature_size)
     #sigmas = np.random.random(feature_size);
 
 #    print sigmas
@@ -203,14 +172,19 @@ def main():
     print distance
 
     numerator   = getSummationLayerNumerator(targets, distance)
-    print numerator
     denominator = getSummationLayerDenominator(distance)
+
+    print("Numerators:")
+    print numerator
+    print("Denominators:")
     print denominator
+    
     yHat = outputLayer(numerator, denominator)
     print len(yHat)
 #    exp_dist = np.exp(-distance)
 #    print exp_dist
 
+    print("  Actual\tPredicted")
     for i in range(sample_size):
         print i, targets[i], yHat[i]
 
