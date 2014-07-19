@@ -64,88 +64,72 @@ def weightedEuclideanDistance(x1, x2, sigma):
     #print len(sigmq)
     
     try:
-        D = sum( ((x1-x2)/sigma)**2 );
-        return D;
+        squared_weighted_dist = ((x1-x2)/sigma)**2
+#        print squared_weighted_dist
+        squared_weighted_dist[squared_weighted_dist == np.inf] = 10000000
+#        print squared_weighted_dist[squared_weighted_dist == 1000000]
+        distance = sum(squared_weighted_dist)
+        return distance;
     except:
         print "Error calculating squared weighted Euclidean Distance"
 
-def computeDistances(sample, sigma):
+# compute disctances between all samples in dataset
+# @local euclidean_distance - type matrix
+#   - euclidean_distance[i][j] : square weighted euclidean distance between sample_i and sample_j
+def computeDistances(data, sigma):
 
-    sample_size = sample.shape[0]
+    sample_size = data.shape[0]
 
-    euclidean_distance = np.zeros(sample_size)
+    euclidean_distance = np.zeros((sample_size, sample_size))
 
     for i in range(sample_size):
         for j in range(sample_size):
-            if i != j:
-#               print i, j
-#               sys.stdout.flush()
-                try:
-                    euclidean_distance[i] += weightedEuclideanDistance(sample[i], sample[j], sigma)
-                except:
-                    print("error calculating distances between %d and %d", i, j)
+#           print i, j
+#           sys.stdout.flush()
+            try:
+                euclidean_distance[i][j] = weightedEuclideanDistance(data[i], data[j], sigma)
+#                if euclidean_distance[i][j] == 0:
+#                    print i, j
+            except:
+                print("error calculating distances between {0} and {1}".format(i, j))
 
     return euclidean_distance
 # ================================================================================
 
-# y_i - actual y value for sample i
-# D - squared weighted euclidean distance
-# out - activation function value
+# @param y          - (vector) actual y values
+# @param distance   - (matrix) squared weighted euclidean distance between samples
+# @return numerator - (vector) nummerator of predicted y values
 
-# note: exp(- is part of activation function (not part of summation layer)
-# should move exp(- into activation function above
-
-def getSummationLayerNumerator(y_i,D):
-  '''Get the summation layer numerator (see eq.6 / 11)'''
-  try:
-    out = float(y_i*math.exp(-D));
-    return out;
-  except:
-    print "Error calculating summation layer numerator"
+def getSummationLayerNumerator(y, distance):
+    '''Get the summation layer numerator (see eq.6 / 11)'''
+    try:
+        # multiply y vector along x axis
+        numerator = sum(y * np.exp(-distance).T)
+        return numerator
+    except:
+        print "Error calculating summation layer numerator"
 # ================================================================================
 
-# transform D (should be part of activation function
-# note: denominator is just the summation of the activation function values
-#             - activation function values are the weights of each y value
+# @param distance - (matrix) squared weighted euclidean distance between samples
+# @return           (vector) denominator of predicted y values
 
-def getSummationLayerDenominator(D):
-  '''Get the summation layer denominator (see eq.6 / 11)'''
-  try:
-    return float(math.exp(-D));
-  except:
-    print "Error getting summation layer denominator."
+def getSummationLayerDenominator(distance):
+    '''Get the summation layer denominator (see eq.6 / 11)'''
+    try:
+        return sum(np.exp(-distance));
+    except:
+        print "Error getting summation layer denominator."
 # ================================================================================
 
-# this code is only computing the predicted value of sample number idx
-#  - not a vector of all y-hat values
-
-# what do you want to do here?
-#    - find vector of y-hats or single y-hat?
-#    - your comment says vector of y-hats
-
-# this function needs to have access to the sample x
-#     - if XminusXI is passed in as X, then sample x is not present in function
-#     - if X is all Xs, then need to test to make sure X[idx] != X[i] in loop
-
-#activation function needs to have access to all sigmas, not just one
-#    - sigma[i] will cause problem, # of Xs not the same as number of sigmas
-#    - problem solved by removing [i] and passing in sigma vector
-
-def outputLayer(idx, X, y, sigma):
-  '''Summation layer "...generates the vector of predicted
-    y-values.", i.e. Y-hat'''
-  try:
-    num   = 0;
-    denom = 0;
-    # find the summation layer numerator(s) and denominator(s)
-    for i in range(X.shape[0]):
-      D      = activationFunction(X[idx],X[i],sigma[i]);
-      num   += getSummationLayerNumerator(y[i],D);
-      denom += getSummationLayerDenominator(D);
-    # return predicted y-values, i.e. y-hat
-    return (float(num)/float(denom));
-  except:
-    print "Error predicting Y-hat in summation layer";
+# @param numerator   - (vector) numerator from summation layer
+# @param denominator - (vector) denominator from summation layer
+# @return      - (vector) predicted y values for each sample
+def outputLayer(numerator, denominator):
+    '''Divide numerator and denominator from summation layer'''
+    try:
+        return numerator/denominator
+    except:
+        print "Error predicting Y-hats in summation layer";
 # ================================================================================
 
 # y - is y a vector or single value?
@@ -200,24 +184,35 @@ def main():
 
     data, targets = getAllOfTheData()
 
+    data = rescaleTheData(data)
+
     sample_size, feature_size = data.shape
 
     print(sample_size, feature_size)
 
     # set initial sigmas
-    sigmas = np.random.random(feature_size);
+    sigmas = np.random.randint(100, 1000, feature_size)
+    #sigmas = np.random.random(feature_size);
 
-    print sigmas
+#    print sigmas
 
     assert len(sigmas) == feature_size
 
     distance = computeDistances(data, sigmas)
 
-    exp_dist = np.exp(distance)
+    print distance
 
-    print exp_dist
+    numerator   = getSummationLayerNumerator(targets, distance)
+    print numerator
+    denominator = getSummationLayerDenominator(distance)
+    print denominator
+    yHat = outputLayer(numerator, denominator)
+    print len(yHat)
+#    exp_dist = np.exp(-distance)
+#    print exp_dist
 
-
+    for i in range(sample_size):
+        print i, targets[i], yHat[i]
 
 
     # unlabeled training set (X) to classify
