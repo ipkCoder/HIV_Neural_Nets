@@ -160,7 +160,7 @@ def getCosts(X,y,sigma):
       # derive from other samples (exclude comparison with self)
       for x_i in xrange(0,N):
         
-        if (X[idx] == X[x_i]).all()v == false:
+        if (X[idx] == X[x_i]).all() == false:
           
           num += getE(X[idx], X[x_i], y[x_i], sigma);
           costs[xI] += float(num) / float(denom);
@@ -174,11 +174,13 @@ def getCosts(X,y,sigma):
 def main():
   try:
     
-	data, targets = getAllOfTheData()
+    data, targets = getAllOfTheData()
 
-	sample_size, feature_size = data.shape
+    sample_size, feature_size = data.shape
 
-	# unlabeled training set (X) to classify
+    print(sample_size)
+
+    # unlabeled training set (X) to classify
     X = np.array([[1.0,2.0,3.0,4.0,5.0],
                   [1.0,1.0,1.0,1.0,1.0],
                   [2.0,3.0,1.5,2.0,1.9],

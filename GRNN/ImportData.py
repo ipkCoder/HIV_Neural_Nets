@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 
-PlaceDataIntoArray(fileName):
+def PlaceDataIntoArray(fileName):
     try:
         with open(fileName, mode='rbU') as csvfile:
             datareader = csv.reader(csvfile, delimiter=',', quotechar=' ')
@@ -20,8 +20,16 @@ PlaceDataIntoArray(fileName):
 #------------------------------------------------------------------------------
 def getAllOfTheData():
     try:
-        data    = placeDataIntoArray(os.path.join(os.getcwd(), 'data.csv'))    
-        targets = placeDataIntoArray(os.path.join(os.getcwd(), 'targets.csv'))
+        try:
+            data    = placeDataIntoArray('data.csv')
+            #data    = placeDataIntoArray(os.path.join(os.getcwd(), 'data.csv'))
+        except:
+            print("data error")
+        try:
+            targets = placeDataIntoArray('targets.csv')
+            #targets = placeDataIntoArray(os.path.join(os.getcwd(), 'targets.csv'))
+        except:
+            print("targets error")
     except:
         print "error getting all of data"
-	return data, targets
+    return data, targets
