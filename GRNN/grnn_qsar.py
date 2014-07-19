@@ -11,6 +11,7 @@
 import numpy as np
 import math
 from ImportData import *
+import sys
 
 # ======= Regarding first TODO ===============
 # what do you mean by map input layer to pattern layer?
@@ -51,17 +52,40 @@ from ImportData import *
 # ================================================================================
 
 # x1 - x sample vector for which to compute predicted value
-# x2 - other x sample in set samples
+# x2 - other x sample in dataset
 # sigma - vector of weights (each weight corresponds to specific feature)
 # return D - squared weighted euclidean distance (single value)
 
-def activationFunction(x1, x2, sigma):
-  '''Get the squared weighted Euclidean distance'''
-  try:
-    D = sum( ( float(x1-x2) / float(sigma) )**2);
-    return D;
-  except:
-    print "Error calculating squared weighted Euclidean Distance"
+# TODO: make sure sigma isn't zero, if is, ???
+def weightedEuclideanDistance(x1, x2, sigma):
+    '''Get the squared weighted Euclidean distance between vector x1 and x2'''
+    #print len(x1)
+    #print len(x2)
+    #print len(sigmq)
+    
+    try:
+        D = sum( ((x1-x2)/sigma)**2 );
+        return D;
+    except:
+        print "Error calculating squared weighted Euclidean Distance"
+
+def computeDistances(sample, sigma):
+
+    sample_size = sample.shape[0]
+
+    euclidean_distance = np.zeros(sample_size)
+
+    for i in range(sample_size):
+        for j in range(sample_size):
+            if i != j:
+#               print i, j
+#               sys.stdout.flush()
+                try:
+                    euclidean_distance[i] += weightedEuclideanDistance(sample[i], sample[j], sigma)
+                except:
+                    print("error calculating distances between %d and %d", i, j)
+
+    return euclidean_distance
 # ================================================================================
 
 # y_i - actual y value for sample i
@@ -173,12 +197,28 @@ def getCosts(X,y,sigma):
 # main function
 def main():
   try:
-    
+
     data, targets = getAllOfTheData()
 
     sample_size, feature_size = data.shape
 
-    print(sample_size)
+    print(sample_size, feature_size)
+
+    # set initial sigmas
+    sigmas = np.random.random(feature_size);
+
+    print sigmas
+
+    assert len(sigmas) == feature_size
+
+    distance = computeDistances(data, sigmas)
+
+    exp_dist = np.exp(distance)
+
+    print exp_dist
+
+
+
 
     # unlabeled training set (X) to classify
     X = np.array([[1.0,2.0,3.0,4.0,5.0],
@@ -193,7 +233,8 @@ def main():
     yHat = np.zeros(sample_size);
     
     # Multiple-sigma model, one weight per descriptor
-    sigmas     = np.arange(1.0,6.0);
+    sigmas     = np.arange(1.0,sample_size+1);
+
     # TODO: How to map trainig sample input layer(s) to pattern layer(s)?
     # Notes: From paper, for a single instance, feed each
     # descriptor feature / sigma weight pair of each training sample
