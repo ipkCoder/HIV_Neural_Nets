@@ -5,6 +5,10 @@ import math
 import sys
 from qsarHelpers import Timer
 
+# neurolab testing
+import neurolab as nl
+import numpy as np
+
 #Local files created by me
 import ANN
 import FromDataFileMLR_DE_BPSO
@@ -39,36 +43,58 @@ def createAnOutputFile():
 # error with predicting X_validation_masked
 
 def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
-
-    xi = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
-    
-    X_train_masked = TrainX.T[xi].T
-    X_validation_masked = ValidateX.T[xi].T
-
-    # create network to fit new set of features (possible diff number of inputs)
-    model.create_network(X_train_masked.shape[1])
-
     # train new model
     try:
-        model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
+        with Timer() as t:
+            xi                           = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
+            X_train_masked               = TrainX.T[xi].T
+            X_validation_masked          = ValidateX.T[xi].T
+
+            # neurolab testing
+            # training
+            inp_xtrain                   = X_train_masked;
+            tar_ytrain                   = np.array( [ np.array([np.array(y)]) for y in TrainY ] );
+            normf                        = nl.tool.Norm(tar_ytrain)
+            tar_ytrain                   = normf(tar_ytrain)
+            # validation
+            inp_xvalidate                = X_validation_masked;
+            tar_yvalidate                = np.array( [ np.array([np.array(y)]) for y in ValidateY ] );
+            normf                        = nl.tool.Norm(tar_yvalidate)
+            tar_yvalidate                = normf(tar_yvalidate)
+
+            # Create network with 2 layers and random initialized
+            inputranges                  = [[[-7, 7]] * inp_xtrain.shape[1]] * inp_xtrain.shape[0]
+            net                          = nl.net.newff([[-7, 7]] * inp_xtrain.shape[1],[int(inp_xtrain.shape[1]), 1])
+            # training on...training set
+            net.train(inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
+            # Run trained network on training set
+            predict_ytrain               = net.sim(inp_xtrain)
+            # Run trained network on validation set
+            predict_yvalidate            = net.sim(inp_xvalidate)
+            # end neurolab test region
+
+            # create network to fit new set of features (possible diff number of inputs)
+            #model.create_network(X_train_masked.shape[1])
+            #model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
+            Yhat_cv         = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model, net)
+
+            # neurolab testing...            
+            # validation
+            inp_xvalidate     = X_validation_masked;
+            predict_yvalidate = net.sim(inp_xvalidate)
+            Yhat_validation   = np.sum(predict_yvalidate)
+        #Yhat_validation = model.predict(X_validation_masked)
+        print "Predicted fitness of individual from findFitnessOfARow in {0} sec.".format(t.interval);
+
+        Y_fitness    = append(TrainY, ValidateY)
+        # padding yhat_fitness with zeroes to match length of Y_fitness
+        Yhat_fitness = append(Yhat_cv, Yhat_validation)
+        zpad               = np.zeros(( len(Y_fitness) - len(Yhat_fitness) ))
+        Yhat_fitness       = np.concatenate((Yhat_fitness,zpad))
+        fitness      = FromFinessFileMLR_DE_BPSO.calc_fitness(xi, Y_fitness, Yhat_fitness, c=2)
+        return fitness;
     except:
-        print "Error training in findFitnessOfARow"
-
-    # print X_train_masked.shape
-    # print TrainY.shape
-    # print X_validation_masked.shape
-    # print ValidateY.shape
-
-    Yhat_cv = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)
-    Yhat_validation = model.predict(X_validation_masked)
-
-    print "Predicted in findFitnessOfARow"
-
-    Y_fitness = append(TrainY, ValidateY)
-    Yhat_fitness = append(Yhat_cv, Yhat_validation)
-    fitness = FromFinessFileMLR_DE_BPSO.calc_fitness(xi, Y_fitness, Yhat_fitness, c=2)
-
-    return fitness
+        print "Error training in findFitnessOfARow";
 #------------------------------------------------------------------------------
 def equal(V1, V2):
    numOfFea = V1.shape[0]
@@ -465,6 +491,8 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                 alpha                             = alpha - alphaDecre
                 beta                              = beta + betaIncre
                 end_time                          = time.time()
+        except:
+            print "error iterating over generation {0} in IterateNTimes".format(i)
         finally:
             print "Generation {} complete: {} min".format(i, (t0.interval/60))
     return
@@ -512,11 +540,11 @@ def main():
     print "********** start time is = ", time.strftime("%H:%M:%S", time.localtime())
     try:
         with Timer() as t:
-            fileW      = createAnOutputFile();
-            model      = ANN.ANN();
-            numOfPop   = 50  # should be 50 population
-            numOfFea   = 396  # should be 396 descriptors
-            unfit      = 1000
+            fileW          = createAnOutputFile();
+            model          = ANN.ANN();
+            numOfPop       = 25  # should be 50 population
+            numOfFea       = 385  # should be 385 descriptors
+            unfit          = 1000
             # Final model requirements
             R2req_train    = .6
             R2req_validate = .5

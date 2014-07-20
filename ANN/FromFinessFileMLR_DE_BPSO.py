@@ -236,15 +236,18 @@ def cv_predict(set_x, set_y, val_x, val_y, model, neurolabANN):
         try:
             with Timer() as t:
                 # neurolab testing starts here...
-                # training on...training set
-                inp_xtrain_individual = np.array([set_x[idx]])
-                tar_ytrain_individual = np.array([np.array([set_y[idx]])])
-
-                error_xtrain          = neurolabANN.train( inp_xtrain_individual , tar_ytrain_individual, epochs=500, show=100, goal=2.0)
-                # Simulate network on...training set
-                out_ytrain            = neurolabANN.sim(inp_xtrain_individual)
-                yhat[idx] = out_ytrain[0][0];
-                # ends here...
+                # individual extracted from training set pool
+                # is the target for prediction by ANN trained on remaining members
+                inp_xtrain_individual  = np.array([set_x[idx]])
+                inp_xtrain             = train_x;
+                tar_ytrain             = np.array( [ np.array([np.array(y)]) for y in train_y ] );
+                normf                  = nl.tool.Norm(tar_ytrain)
+                tar_ytrain             = normf(tar_ytrain)
+                neurolabANN.train( inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
+                # Run trained ANN against individual extracted from training set
+                prediction_trainerror  = neurolabANN.sim(inp_xtrain_individual)
+                yhat[idx]              = prediction_trainerror[0][0]
+                # end neurolab test region
 
                 #modelName = model.train(train_x, train_y, val_x, val_y)
                 #yhat[idx] = model.predict(set_x[idx])
@@ -358,28 +361,23 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
 
                     # neurolab testing
                     # training
-                    inp_xtrain           = X_train_masked;
-                    tar_ytrain           = np.array( [ np.array([np.array(y)]) for y in TrainY ] );
-                    normf = nl.tool.Norm(tar_ytrain)
-                    tar_ytrain = normf(tar_ytrain)
+                    inp_xtrain                              = X_train_masked;
+                    tar_ytrain                              = np.array( [ np.array([np.array(y)]) for y in TrainY ] );
+                    normf                                   = nl.tool.Norm(tar_ytrain)
+                    tar_ytrain                              = normf(tar_ytrain)
                     # validation
-                    inp_xvalidate        = X_validation_masked;
-                    tar_yvalidate        = np.array( [ np.array([np.array(y)]) for y in ValidateY ] );
-                    normf = nl.tool.Norm(tar_yvalidate)
-                    tar_yvalidate = normf(tar_yvalidate)
+                    inp_xvalidate                           = X_validation_masked;
 
                     # Create network with 2 layers and random initialized
-                    inputranges             = [[[-7, 7]] * inp_xtrain.shape[1]] * inp_xtrain.shape[0]
-                    net                     = nl.net.newff([[-7, 7]] * inp_xtrain.shape[1],[int(inp_xtrain.shape[1]), 1])
+                    inputranges                             = [[[-7, 7]] * inp_xtrain.shape[1]] * inp_xtrain.shape[0]
+                    net                                     = nl.net.newff([[-7, 7]] * inp_xtrain.shape[1],[int(inp_xtrain.shape[1]), 1])
                     # training on...training set
-                    error_xtrain            = net.train(inp_xtrain, tar_ytrain, epochs=500, show=100, goal=2.0)
-                    # Simulate network on...training set
-                    out_ytrain              = net.sim(inp_xtrain)
-                    
-                    # validation on...validation set
-                    error_xvalidate         = net.train(inp_xvalidate, tar_yvalidate, epochs=500, show=100, goal=2.0)
-                    # Simulate network on...validation set
-                    out_yvalidate           = net.sim(inp_xvalidate)
+                    net.train(inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
+                    # Run trained network on training set
+                    prediction_trainerror                   = net.sim(inp_xtrain)
+                    # Run trained network on validation set
+                    prediction_validationerror              = net.sim(inp_xvalidate)
+                    # end neurolab test region
 
                     #model.create_network(X_train_masked.shape[1])
                     #model_desc   = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
@@ -400,14 +398,16 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             
             # neurolab testing...            
             # validation
-            inp_xvalidate          = X_validation_masked;
-            out_yvalidate          = net.sim(inp_xvalidate)
+            inp_xvalidate                       = X_validation_masked;
+            prediction_validationerror          = net.sim(inp_xvalidate)
             # test
-            inp_xtest              = X_test_masked;
-            out_ytest              = net.sim(inp_xtest)
+            inp_xtest                           = X_test_masked;
+            prediction_testerror                = net.sim(inp_xtest)
 
-            Yhat_validation        = np.sum(out_yvalidate)
-            Yhat_test              = np.sum(out_ytest)
+            Yhat_validation        = np.sum(prediction_validationerror)
+            Yhat_test              = np.sum(prediction_testerror)
+            # end neurolab test region
+
             #Yhat_validation = model.predict(X_validation_masked)
             #Yhat_test       = model.predict(X_test_masked)
             # Compute statistics for the coefficient of determination (R2)
@@ -416,10 +416,12 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             r2pred_validation  = r2Pred(TrainY, ValidateY, Yhat_validation)
             r2pred_test        = r2Pred(TrainY, TestY, Yhat_test)
             Y_fitness          = append(TrainY, ValidateY)
+
+            # padding yhat_fitness with zeroes to match length of Y_fitness
             Yhat_fitness       = append(Yhat_cv, Yhat_validation)    
             zpad               = np.zeros(( len(Y_fitness) - len(Yhat_fitness) ))
             Yhat_fitness       = np.concatenate((Yhat_fitness,zpad))
-            fitness[i]         = calc_fitness(xi, Y_fitness[0:len(Yhat_fitness)], Yhat_fitness, c)
+            fitness[i]         = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
             # ignore and continue if predictive quality is too low
             # between either the training, cross-validation or test sets
             # i.e. if it's not worth recording, just return the fitness
@@ -462,7 +464,7 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             yHatValidation[idx]        = Yhat_validation.tolist()
             yTest[idx]                 = TestY.tolist()
             yHatTest[idx]              = Yhat_test.tolist()
-        print "Trained and found results for population {}: {}".format(i, t.interval)
+        print "Trained and found results for population {0} in: {1} sec".format(i, t.interval)
 
     #printing the information into the file
     write(model,fileW, trackDesc, trackIdx, trackFitness, trackModel, trackR2,\
