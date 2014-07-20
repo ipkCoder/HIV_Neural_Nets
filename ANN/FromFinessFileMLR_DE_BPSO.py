@@ -416,10 +416,12 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             r2pred_validation  = r2Pred(TrainY, ValidateY, Yhat_validation)
             r2pred_test        = r2Pred(TrainY, TestY, Yhat_test)
             Y_fitness          = append(TrainY, ValidateY)
+
+            # padding yhat_fitness with zeroes to match length of Y_fitness
             Yhat_fitness       = append(Yhat_cv, Yhat_validation)    
             zpad               = np.zeros(( len(Y_fitness) - len(Yhat_fitness) ))
             Yhat_fitness       = np.concatenate((Yhat_fitness,zpad))
-            fitness[i]         = calc_fitness(xi, Y_fitness[0:len(Yhat_fitness)], Yhat_fitness, c)
+            fitness[i]         = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
             # ignore and continue if predictive quality is too low
             # between either the training, cross-validation or test sets
             # i.e. if it's not worth recording, just return the fitness
@@ -462,7 +464,7 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             yHatValidation[idx]        = Yhat_validation.tolist()
             yTest[idx]                 = TestY.tolist()
             yHatTest[idx]              = Yhat_test.tolist()
-        print "Trained and found results for population {}: {}".format(i, t.interval)
+        print "Trained and found results for population {0} in: {1} sec".format(i, t.interval)
 
     #printing the information into the file
     write(model,fileW, trackDesc, trackIdx, trackFitness, trackModel, trackR2,\
