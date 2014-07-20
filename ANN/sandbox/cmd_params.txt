@@ -1,7 +1,0 @@
-Mini data set
-===
--t C:\temp\research\datasets\Train-Data.csv -a C:\temp\research\datasets\Train-pIC50.csv -v C:\temp\research\datasets\Validation-Data.csv -b C:\temp\research\datasets\Validation-pIC50.csv -s C:\temp\research\datasets\Test-Data.csv -c C:\temp\research\datasets\Test-pIC50.csv
-
-Full data-set
-===
--t C:\temp\research\datasets\new_data\train_x.csv -a C:\temp\research\datasets\new_data\train_y.csv -v C:\temp\research\datasets\new_data\validation_x.csv -b C:\temp\research\datasets\new_data\validation_y.csv -s C:\temp\research\datasets\new_data\test_x.csv -c C:\temp\research\datasets\new_data\test_y.csv
