@@ -8,7 +8,8 @@ from qsarHelpers import Timer
 #Local files created by me
 import ANN
 import FromDataFileMLR_DE_BPSO
-import FromFinessFileMLR_DE_BPSO
+import FromFinessFileMLR_DE_BPSO_2 as FromFinessFileMLR_DE_BPSO
+
 #------------------------------------------------------
 def getTwoDecPoint(x):
     return float("%.2f"%x)
@@ -24,13 +25,16 @@ def createAnOutputFile():
                             alg.model.__class__.__name__, alg.gen_max,timestamp)
         elif file_name==None:
             file_name = "{}.csv".format(timestamp)
-        fileOut = file(file_name, 'wb')
+        fileOut = open(file_name, 'wb', 0)
         fileW = csv.writer(fileOut)
             
-        fileW.writerow(['Descriptor ID', 'No. Descriptors', 'Fitness', 'Model','R2', 'Q2', \
+        try:
+            fileW.writerow(['Generation', 'Individual', 'Descriptor ID', 'No. Descriptors', 'Fitness', 'Model','R2', 'Q2', \
                 'R2Pred_Validation', 'R2Pred_Test','SEE_Train', 'SDEP_Validation', 'SDEP_Test', \
                 'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', 'yHat_Test'])
-    
+
+        except:
+            print("couldn't write to file")
         return fileW;
     except:
         print "error creting outout file"
@@ -41,7 +45,8 @@ def createAnOutputFile():
 def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
 
     xi = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
-    
+
+    # select features from samples
     X_train_masked = TrainX.T[xi].T
     X_validation_masked = ValidateX.T[xi].T
 
@@ -53,11 +58,6 @@ def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
         model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
     except:
         print "Error training in findFitnessOfARow"
-
-    # print X_train_masked.shape
-    # print TrainY.shape
-    # print X_validation_masked.shape
-    # print ValidateY.shape
 
     Yhat_cv = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)
     Yhat_validation = model.predict(X_validation_masked)
@@ -449,7 +449,7 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
             
                     try:
                         with Timer() as t1:
-                            fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(model,fileW, \
+                            fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(i+1, model,fileW, \
                                         population, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
                     finally:
                         print "Validated model in {} min".format((t1.interval/60))      
@@ -515,7 +515,7 @@ def main():
             fileW      = createAnOutputFile();
             model      = ANN.ANN();
             numOfPop   = 50  # should be 50 population
-            numOfFea   = 396  # should be 396 descriptors
+            numOfFea   = 385  # old data (396), new data (385)
             unfit      = 1000
             # Final model requirements
             R2req_train    = .6
@@ -524,6 +524,12 @@ def main():
             # get training, validation, test data and rescale
             TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
             TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
+            TrainX = TrainX[:20]
+            TrainY = TrainY[:20]
+            print TrainX.shape
+            print TrainY.shape
+
+    
     finally:
         print( "Time to load and rescale data: {:.03f} sec".format(t.interval) )
     
@@ -536,7 +542,7 @@ def main():
             while (fittingStatus == unfit):
                 # create inititial population and find fitness for each row in population
                 population             = createInitPopMat(numOfPop, numOfFea)
-                fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(model,fileW, population, 
+                fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(0, model,fileW, population, 
                     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
     finally:
         print "Validated model: {} min".format((t.interval/60))
