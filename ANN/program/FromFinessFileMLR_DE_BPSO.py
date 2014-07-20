@@ -303,7 +303,7 @@ def OnlySelectTheOnesColumns(popI):
 
 #------------------------------------------------------------------------------
 #Ahmad Hadaegh: Modified  on: July 16, 2013
-def validate_model(model, fileW, population, TrainX, TrainY,\
+def validate_model(generation, model, fileW, population, TrainX, TrainY,\
                    ValidateX, ValidateY, TestX, TestY):
     numOfPop   = population.shape[0]
     fitness    = zeros(numOfPop)
@@ -380,6 +380,7 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             sdep_validation            = sdep(ValidateY, Yhat_validation)
             sdep_test                  = sdep(TrainY, Yhat_train)
             idxLength                  = len(xi)
+            
             # store stats
             trackDesc[idx]             = str(xi)
             trackIdx[idx]              = idxLength
@@ -401,24 +402,22 @@ def validate_model(model, fileW, population, TrainX, TrainY,\
             yHatTest[idx]              = Yhat_test.tolist()
         print "Trained and found results for population {}: {}".format(i, t.interval)
 
-    #printing the information into the file
-    write(model,fileW, trackDesc, trackIdx, trackFitness, trackModel, trackR2,\
-            trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
-            trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
-            yValidation, yHatValidation, yTest, yHatTest)
+        #printing the information into the file
+        write(fileW, generation, i, trackDesc[idx], trackIdx[idx], trackFitness[idx], trackModel[idx],
+            trackR2[idx], trackQ2[idx],trackR2PredValidation[idx], trackR2PredTest[idx], trackSEETrain[idx], \
+            trackSDEPValidation[idx], trackSDEPTest[idx], yTrain[idx], yHatTrain[idx], yHatCV[idx], \
+            yValidation[idx], yHatValidation[idx], yTest[idx], yHatTest[idx])
 
     return itFits, fitness
 #------------------------------------------------------------------------------  
 #Ahmad Hadaegh: Modified  on: July 16, 2013
-def write(model,fileW, trackDesc, trackIdx, trackFitness, trackModel, trackR2, \
+def write(fileW, generation, individual, trackDesc, trackIdx, trackFitness, trackModel, trackR2, \
           trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
           trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
           yValidation, yHatValidation, yTest, yHatTest): 
-    
-    for key in trackFitness.keys():
-        fileW.writerow([trackDesc[key], trackIdx[key], trackFitness[key], trackModel[key], \
-            trackR2[key], trackQ2[key], trackR2PredValidation[key], trackR2PredTest[key], \
-            trackSEETrain[key], trackSDEPValidation[key], trackSDEPTest[key], \
-            yTrain[key], yHatTrain[key], yHatCV[key], yValidation[key], yHatValidation[key], \
-            yTest[key], yHatTest[key]])
+
+    fileW.writerow([generation, individual, trackDesc, trackIdx, trackFitness, trackModel, trackR2, \
+        trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
+        trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
+        yValidation, yHatValidation, yTest, yHatTest])
     #fileOut.close()
