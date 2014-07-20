@@ -46,43 +46,45 @@ def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
     # train new model
     try:
         with Timer() as t:
-            xi                           = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
-            X_train_masked               = TrainX.T[xi].T
-            X_validation_masked          = ValidateX.T[xi].T
+            xi                   = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
+            X_train_masked       = TrainX.T[xi].T
+            X_validation_masked  = ValidateX.T[xi].T
 
             # neurolab testing
             # training
-            inp_xtrain                   = X_train_masked;
-            tar_ytrain                   = np.array( [ np.array([np.array(y)]) for y in TrainY ] );
-            normf                        = nl.tool.Norm(tar_ytrain)
-            tar_ytrain                   = normf(tar_ytrain)
+            inp_xtrain           = X_train_masked;
+            tar_ytrain           = np.array( [ np.array([np.array(y)]) for y in TrainY ] );
+            normf                = nl.tool.Norm(tar_ytrain)
+            tar_ytrain           = normf(tar_ytrain)
             # validation
-            inp_xvalidate                = X_validation_masked;
-            tar_yvalidate                = np.array( [ np.array([np.array(y)]) for y in ValidateY ] );
-            normf                        = nl.tool.Norm(tar_yvalidate)
-            tar_yvalidate                = normf(tar_yvalidate)
+            inp_xvalidate        = X_validation_masked;
+            tar_yvalidate        = np.array( [ np.array([np.array(y)]) for y in ValidateY ] );
+            normf                = nl.tool.Norm(tar_yvalidate)
+            tar_yvalidate        = normf(tar_yvalidate)
 
             # Create network with 2 layers and random initialized
-            inputranges                  = [[[-7, 7]] * inp_xtrain.shape[1]] * inp_xtrain.shape[0]
-            net                          = nl.net.newff([[-7, 7]] * inp_xtrain.shape[1],[int(inp_xtrain.shape[1]), 1])
+            inputranges             = [[[-7, 7]] * inp_xtrain.shape[1]] * inp_xtrain.shape[0]
+            net                     = nl.net.newff([[-7, 7]] * inp_xtrain.shape[1],[int(inp_xtrain.shape[1]), 1])
             # training on...training set
-            error_xtrain                 = net.train(inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
-            # Run trained network on training set
-            predict_ytrain               = net.sim(inp_xtrain)
-            # Run trained network on validation set
-            predict_yvalidate            = net.sim(inp_xvalidate)
-            # end neurolab test region
-
+            error_xtrain            = net.train(inp_xtrain, tar_ytrain, epochs=500, show=100, goal=2.0)
+            # Simulate network on...training set
+            out_ytrain              = net.sim(inp_xtrain)
+                    
+            # validation on...validation set
+            error_xvalidate         = net.train(inp_xvalidate, tar_yvalidate, epochs=500, show=100, goal=2.0)
+            # Simulate network on...validation set
+            out_yvalidate           = net.sim(inp_xvalidate)
             # create network to fit new set of features (possible diff number of inputs)
             #model.create_network(X_train_masked.shape[1])
             #model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
+
             Yhat_cv         = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model, net)
 
             # neurolab testing...            
             # validation
-            inp_xvalidate     = X_validation_masked;
-            predict_yvalidate = net.sim(inp_xvalidate)
-            Yhat_validation   = np.sum(predict_yvalidate)
+            inp_xvalidate          = X_validation_masked;
+            out_yvalidate          = net.sim(inp_xvalidate)
+            Yhat_validation        = np.sum(out_yvalidate)
         #Yhat_validation = model.predict(X_validation_masked)
         print "Predicted fitness of individual from findFitnessOfARow in {0} sec.".format(t.interval);
 
@@ -543,7 +545,7 @@ def main():
             fileW          = createAnOutputFile();
             model          = ANN.ANN();
             numOfPop       = 25  # should be 50 population
-            numOfFea       = 385  # should be 385 descriptors
+            numOfFea       = 396  # should be 396 descriptors
             unfit          = 1000
             # Final model requirements
             R2req_train    = .6
