@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>1637d030-c6d2-4d16-9c7e-d03c4e51cb62</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>Main-ANN-DE-BPSO.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>sandbox</Name>
+    <RootNamespace>sandbox</RootNamespace>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>-t C:\temp\research\datasets\new_dataset\train_x.csv -a C:\temp\research\datasets\new_dataset\train_y.csv -v C:\temp\research\datasets\new_dataset\validation_x.csv -b C:\temp\research\datasets\new_dataset\validation_y.csv -s C:\temp\research\datasets\new_dataset\test_x.csv -c C:\temp\research\datasets\new_dataset\test_y.csv</CommandLineArguments>
+    <InterpreterPath />
+    <InterpreterArguments />
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ANN.py" />
+    <Compile Include="FromDataFileMLR_DE_BPSO.py" />
+    <Compile Include="FromFinessFileMLR_DE_BPSO.py" />
+    <Compile Include="Main-ANN-DE-BPSO.py" />
+    <Compile Include="neurolab_test.py" />
+    <Compile Include="optimizationLibrary.py" />
+    <Compile Include="qsarHelpers.py" />
+    <Compile Include="test_ann.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Test-Data.csv" />
+    <Content Include="Test-pIC50.csv" />
+    <Content Include="Train-Data.csv" />
+    <Content Include="Train-pIC50.csv" />
+    <Content Include="Validation-Data.csv" />
+    <Content Include="Validation-pIC50.csv" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+</Project>

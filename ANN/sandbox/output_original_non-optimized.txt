@@ -1,0 +1,303 @@
+********** start time is =  08:38:03
+Time to load and rescale data: 0.026 sec
+ANN.py - Time to trainUntilConvergence: 32.837 sec.
+Trained model for population 0 in 32.8395852503 sec
+Models to train: 63
+ANN.py - Time to trainUntilConvergence: 31.604 sec.
+Trained cv individual 0 in cv_predict: 31.606 sec.
+ANN.py - Time to trainUntilConvergence: 32.943 sec.
+Trained cv individual 1 in cv_predict: 32.945 sec.
+ANN.py - Time to trainUntilConvergence: 31.576 sec.
+Trained cv individual 2 in cv_predict: 31.578 sec.
+ANN.py - Time to trainUntilConvergence: 31.742 sec.
+Trained cv individual 3 in cv_predict: 31.745 sec.
+ANN.py - Time to trainUntilConvergence: 31.503 sec.
+Trained cv individual 4 in cv_predict: 31.505 sec.
+ANN.py - Time to trainUntilConvergence: 31.470 sec.
+Trained cv individual 5 in cv_predict: 31.472 sec.
+ANN.py - Time to trainUntilConvergence: 31.654 sec.
+Trained cv individual 6 in cv_predict: 31.656 sec.
+ANN.py - Time to trainUntilConvergence: 32.205 sec.
+Trained cv individual 7 in cv_predict: 32.207 sec.
+ANN.py - Time to trainUntilConvergence: 31.562 sec.
+Trained cv individual 8 in cv_predict: 31.565 sec.
+ANN.py - Time to trainUntilConvergence: 31.474 sec.
+Trained cv individual 9 in cv_predict: 31.476 sec.
+ANN.py - Time to trainUntilConvergence: 32.303 sec.
+Trained cv individual 10 in cv_predict: 32.306 sec.
+ANN.py - Time to trainUntilConvergence: 31.890 sec.
+Trained cv individual 11 in cv_predict: 31.892 sec.
+ANN.py - Time to trainUntilConvergence: 32.486 sec.
+Trained cv individual 12 in cv_predict: 32.488 sec.
+ANN.py - Time to trainUntilConvergence: 31.294 sec.
+Trained cv individual 13 in cv_predict: 31.296 sec.
+ANN.py - Time to trainUntilConvergence: 30.873 sec.
+Trained cv individual 14 in cv_predict: 30.875 sec.
+ANN.py - Time to trainUntilConvergence: 30.960 sec.
+Trained cv individual 15 in cv_predict: 30.962 sec.
+ANN.py - Time to trainUntilConvergence: 30.811 sec.
+Trained cv individual 16 in cv_predict: 30.813 sec.
+ANN.py - Time to trainUntilConvergence: 30.988 sec.
+Trained cv individual 17 in cv_predict: 30.990 sec.
+ANN.py - Time to trainUntilConvergence: 30.784 sec.
+Trained cv individual 18 in cv_predict: 30.786 sec.
+ANN.py - Time to trainUntilConvergence: 30.838 sec.
+Trained cv individual 19 in cv_predict: 30.840 sec.
+ANN.py - Time to trainUntilConvergence: 31.912 sec.
+Trained cv individual 20 in cv_predict: 31.914 sec.
+ANN.py - Time to trainUntilConvergence: 30.627 sec.
+Trained cv individual 21 in cv_predict: 30.629 sec.
+ANN.py - Time to trainUntilConvergence: 30.805 sec.
+Trained cv individual 22 in cv_predict: 30.807 sec.
+ANN.py - Time to trainUntilConvergence: 30.839 sec.
+Trained cv individual 23 in cv_predict: 30.841 sec.
+ANN.py - Time to trainUntilConvergence: 30.679 sec.
+Trained cv individual 24 in cv_predict: 30.681 sec.
+ANN.py - Time to trainUntilConvergence: 31.100 sec.
+Trained cv individual 25 in cv_predict: 31.102 sec.
+ANN.py - Time to trainUntilConvergence: 31.107 sec.
+Trained cv individual 26 in cv_predict: 31.109 sec.
+ANN.py - Time to trainUntilConvergence: 31.362 sec.
+Trained cv individual 27 in cv_predict: 31.364 sec.
+ANN.py - Time to trainUntilConvergence: 31.423 sec.
+Trained cv individual 28 in cv_predict: 31.425 sec.
+ANN.py - Time to trainUntilConvergence: 32.018 sec.
+Trained cv individual 29 in cv_predict: 32.020 sec.
+ANN.py - Time to trainUntilConvergence: 30.925 sec.
+Trained cv individual 30 in cv_predict: 30.927 sec.
+ANN.py - Time to trainUntilConvergence: 30.986 sec.
+Trained cv individual 31 in cv_predict: 30.988 sec.
+ANN.py - Time to trainUntilConvergence: 30.900 sec.
+Trained cv individual 32 in cv_predict: 30.902 sec.
+ANN.py - Time to trainUntilConvergence: 30.736 sec.
+Trained cv individual 33 in cv_predict: 30.738 sec.
+ANN.py - Time to trainUntilConvergence: 30.702 sec.
+Trained cv individual 34 in cv_predict: 30.704 sec.
+ANN.py - Time to trainUntilConvergence: 30.894 sec.
+Trained cv individual 35 in cv_predict: 30.897 sec.
+ANN.py - Time to trainUntilConvergence: 9.838 sec.
+Trained cv individual 36 in cv_predict: 9.840 sec.
+ANN.py - Time to trainUntilConvergence: 30.949 sec.
+Trained cv individual 37 in cv_predict: 30.952 sec.
+ANN.py - Time to trainUntilConvergence: 30.762 sec.
+Trained cv individual 38 in cv_predict: 30.764 sec.
+ANN.py - Time to trainUntilConvergence: 30.720 sec.
+Trained cv individual 39 in cv_predict: 30.722 sec.
+ANN.py - Time to trainUntilConvergence: 32.082 sec.
+Trained cv individual 40 in cv_predict: 32.084 sec.
+ANN.py - Time to trainUntilConvergence: 30.907 sec.
+Trained cv individual 41 in cv_predict: 30.909 sec.
+ANN.py - Time to trainUntilConvergence: 30.913 sec.
+Trained cv individual 42 in cv_predict: 30.915 sec.
+ANN.py - Time to trainUntilConvergence: 30.845 sec.
+Trained cv individual 43 in cv_predict: 30.848 sec.
+ANN.py - Time to trainUntilConvergence: 31.061 sec.
+Trained cv individual 44 in cv_predict: 31.063 sec.
+ANN.py - Time to trainUntilConvergence: 30.912 sec.
+Trained cv individual 45 in cv_predict: 30.914 sec.
+ANN.py - Time to trainUntilConvergence: 30.865 sec.
+Trained cv individual 46 in cv_predict: 30.867 sec.
+ANN.py - Time to trainUntilConvergence: 30.749 sec.
+Trained cv individual 47 in cv_predict: 30.751 sec.
+ANN.py - Time to trainUntilConvergence: 7.714 sec.
+Trained cv individual 48 in cv_predict: 7.716 sec.
+ANN.py - Time to trainUntilConvergence: 31.086 sec.
+Trained cv individual 49 in cv_predict: 31.088 sec.
+ANN.py - Time to trainUntilConvergence: 30.740 sec.
+Trained cv individual 50 in cv_predict: 30.742 sec.
+ANN.py - Time to trainUntilConvergence: 30.719 sec.
+Trained cv individual 51 in cv_predict: 30.722 sec.
+ANN.py - Time to trainUntilConvergence: 30.774 sec.
+Trained cv individual 52 in cv_predict: 30.776 sec.
+ANN.py - Time to trainUntilConvergence: 30.769 sec.
+Trained cv individual 53 in cv_predict: 30.772 sec.
+ANN.py - Time to trainUntilConvergence: 30.943 sec.
+Trained cv individual 54 in cv_predict: 30.945 sec.
+ANN.py - Time to trainUntilConvergence: 30.832 sec.
+Trained cv individual 55 in cv_predict: 30.834 sec.
+ANN.py - Time to trainUntilConvergence: 30.848 sec.
+Trained cv individual 56 in cv_predict: 30.850 sec.
+ANN.py - Time to trainUntilConvergence: 2121.737 sec.
+Trained cv individual 57 in cv_predict: 2121.740 sec.
+ANN.py - Time to trainUntilConvergence: 35.253 sec.
+Trained cv individual 58 in cv_predict: 35.255 sec.
+ANN.py - Time to trainUntilConvergence: 31.103 sec.
+Trained cv individual 59 in cv_predict: 31.105 sec.
+ANN.py - Time to trainUntilConvergence: 32.000 sec.
+Trained cv individual 60 in cv_predict: 32.002 sec.
+ANN.py - Time to trainUntilConvergence: 31.083 sec.
+Trained cv individual 61 in cv_predict: 31.085 sec.
+ANN.py - Time to trainUntilConvergence: 31.262 sec.
+Trained cv individual 62 in cv_predict: 31.264 sec.
+Cross validate for 0: 4015.58364875
+Trained and found results for population 0: 4048.44068763
+failed to train
+Trained model for population 1 in 6.64891840643e-05 sec
+failed to train
+Trained model for population 0 in 7.0059072641e-05 sec
+ANN.py - Time to trainUntilConvergence: 31.626 sec.
+Trained model for population 0 in 31.6288774573 sec
+Models to train: 63
+ANN.py - Time to trainUntilConvergence: 30.829 sec.
+Trained cv individual 0 in cv_predict: 30.831 sec.
+ANN.py - Time to trainUntilConvergence: 31.016 sec.
+Trained cv individual 1 in cv_predict: 31.018 sec.
+ANN.py - Time to trainUntilConvergence: 31.405 sec.
+Trained cv individual 2 in cv_predict: 31.407 sec.
+ANN.py - Time to trainUntilConvergence: 30.842 sec.
+Trained cv individual 3 in cv_predict: 30.844 sec.
+ANN.py - Time to trainUntilConvergence: 30.760 sec.
+Trained cv individual 4 in cv_predict: 30.762 sec.
+ANN.py - Time to trainUntilConvergence: 30.982 sec.
+Trained cv individual 5 in cv_predict: 30.985 sec.
+ANN.py - Time to trainUntilConvergence: 30.717 sec.
+Trained cv individual 6 in cv_predict: 30.719 sec.
+ANN.py - Time to trainUntilConvergence: 30.805 sec.
+Trained cv individual 7 in cv_predict: 30.807 sec.
+ANN.py - Time to trainUntilConvergence: 30.851 sec.
+Trained cv individual 8 in cv_predict: 30.854 sec.
+ANN.py - Time to trainUntilConvergence: 30.910 sec.
+Trained cv individual 9 in cv_predict: 30.912 sec.
+ANN.py - Time to trainUntilConvergence: 30.782 sec.
+Trained cv individual 10 in cv_predict: 30.784 sec.
+ANN.py - Time to trainUntilConvergence: 31.326 sec.
+Trained cv individual 11 in cv_predict: 31.328 sec.
+ANN.py - Time to trainUntilConvergence: 31.288 sec.
+Trained cv individual 12 in cv_predict: 31.290 sec.
+ANN.py - Time to trainUntilConvergence: 31.237 sec.
+Trained cv individual 13 in cv_predict: 31.239 sec.
+ANN.py - Time to trainUntilConvergence: 31.946 sec.
+Trained cv individual 14 in cv_predict: 31.948 sec.
+ANN.py - Time to trainUntilConvergence: 31.185 sec.
+Trained cv individual 15 in cv_predict: 31.187 sec.
+ANN.py - Time to trainUntilConvergence: 30.831 sec.
+Trained cv individual 16 in cv_predict: 30.833 sec.
+ANN.py - Time to trainUntilConvergence: 30.835 sec.
+Trained cv individual 17 in cv_predict: 30.837 sec.
+ANN.py - Time to trainUntilConvergence: 31.072 sec.
+Trained cv individual 18 in cv_predict: 31.074 sec.
+ANN.py - Time to trainUntilConvergence: 30.824 sec.
+Trained cv individual 19 in cv_predict: 30.827 sec.
+ANN.py - Time to trainUntilConvergence: 30.845 sec.
+Trained cv individual 20 in cv_predict: 30.847 sec.
+ANN.py - Time to trainUntilConvergence: 30.875 sec.
+Trained cv individual 21 in cv_predict: 30.877 sec.
+ANN.py - Time to trainUntilConvergence: 31.123 sec.
+Trained cv individual 22 in cv_predict: 31.126 sec.
+ANN.py - Time to trainUntilConvergence: 30.829 sec.
+Trained cv individual 23 in cv_predict: 30.832 sec.
+ANN.py - Time to trainUntilConvergence: 30.930 sec.
+Trained cv individual 24 in cv_predict: 30.932 sec.
+ANN.py - Time to trainUntilConvergence: 31.016 sec.
+Trained cv individual 25 in cv_predict: 31.018 sec.
+ANN.py - Time to trainUntilConvergence: 30.942 sec.
+Trained cv individual 26 in cv_predict: 30.944 sec.
+ANN.py - Time to trainUntilConvergence: 30.856 sec.
+Trained cv individual 27 in cv_predict: 30.858 sec.
+ANN.py - Time to trainUntilConvergence: 30.859 sec.
+Trained cv individual 28 in cv_predict: 30.861 sec.
+ANN.py - Time to trainUntilConvergence: 30.728 sec.
+Trained cv individual 29 in cv_predict: 30.730 sec.
+ANN.py - Time to trainUntilConvergence: 30.888 sec.
+Trained cv individual 30 in cv_predict: 30.890 sec.
+ANN.py - Time to trainUntilConvergence: 30.867 sec.
+Trained cv individual 31 in cv_predict: 30.869 sec.
+ANN.py - Time to trainUntilConvergence: 30.769 sec.
+Trained cv individual 32 in cv_predict: 30.771 sec.
+ANN.py - Time to trainUntilConvergence: 30.824 sec.
+Trained cv individual 33 in cv_predict: 30.826 sec.
+ANN.py - Time to trainUntilConvergence: 16.322 sec.
+Trained cv individual 34 in cv_predict: 16.324 sec.
+ANN.py - Time to trainUntilConvergence: 30.980 sec.
+Trained cv individual 35 in cv_predict: 30.982 sec.
+ANN.py - Time to trainUntilConvergence: 30.803 sec.
+Trained cv individual 36 in cv_predict: 30.805 sec.
+ANN.py - Time to trainUntilConvergence: 30.778 sec.
+Trained cv individual 37 in cv_predict: 30.780 sec.
+ANN.py - Time to trainUntilConvergence: 30.860 sec.
+Trained cv individual 38 in cv_predict: 30.862 sec.
+ANN.py - Time to trainUntilConvergence: 31.068 sec.
+Trained cv individual 39 in cv_predict: 31.070 sec.
+ANN.py - Time to trainUntilConvergence: 30.803 sec.
+Trained cv individual 40 in cv_predict: 30.805 sec.
+ANN.py - Time to trainUntilConvergence: 30.971 sec.
+Trained cv individual 41 in cv_predict: 30.973 sec.
+ANN.py - Time to trainUntilConvergence: 30.630 sec.
+Trained cv individual 42 in cv_predict: 30.632 sec.
+ANN.py - Time to trainUntilConvergence: 31.763 sec.
+Trained cv individual 43 in cv_predict: 31.765 sec.
+ANN.py - Time to trainUntilConvergence: 30.646 sec.
+Trained cv individual 44 in cv_predict: 30.649 sec.
+ANN.py - Time to trainUntilConvergence: 30.667 sec.
+Trained cv individual 45 in cv_predict: 30.669 sec.
+ANN.py - Time to trainUntilConvergence: 30.838 sec.
+Trained cv individual 46 in cv_predict: 30.840 sec.
+ANN.py - Time to trainUntilConvergence: 30.960 sec.
+Trained cv individual 47 in cv_predict: 30.962 sec.
+ANN.py - Time to trainUntilConvergence: 28.869 sec.
+Trained cv individual 48 in cv_predict: 28.871 sec.
+ANN.py - Time to trainUntilConvergence: 32.243 sec.
+Trained cv individual 49 in cv_predict: 32.246 sec.
+ANN.py - Time to trainUntilConvergence: 30.841 sec.
+Trained cv individual 50 in cv_predict: 30.843 sec.
+ANN.py - Time to trainUntilConvergence: 2581.882 sec.
+Trained cv individual 51 in cv_predict: 2581.884 sec.
+ANN.py - Time to trainUntilConvergence: 31.660 sec.
+Trained cv individual 52 in cv_predict: 31.662 sec.
+ANN.py - Time to trainUntilConvergence: 32.800 sec.
+Trained cv individual 53 in cv_predict: 32.803 sec.
+ANN.py - Time to trainUntilConvergence: 31.277 sec.
+Trained cv individual 54 in cv_predict: 31.279 sec.
+ANN.py - Time to trainUntilConvergence: 30.870 sec.
+Trained cv individual 55 in cv_predict: 30.872 sec.
+ANN.py - Time to trainUntilConvergence: 31.026 sec.
+Trained cv individual 56 in cv_predict: 31.028 sec.
+ANN.py - Time to trainUntilConvergence: 30.953 sec.
+Trained cv individual 57 in cv_predict: 30.955 sec.
+ANN.py - Time to trainUntilConvergence: 30.781 sec.
+Trained cv individual 58 in cv_predict: 30.783 sec.
+ANN.py - Time to trainUntilConvergence: 30.988 sec.
+Trained cv individual 59 in cv_predict: 30.990 sec.
+ANN.py - Time to trainUntilConvergence: 31.438 sec.
+Trained cv individual 60 in cv_predict: 31.441 sec.
+ANN.py - Time to trainUntilConvergence: 30.899 sec.
+Trained cv individual 61 in cv_predict: 30.901 sec.
+ANN.py - Time to trainUntilConvergence: 30.828 sec.
+Trained cv individual 62 in cv_predict: 30.831 sec.
+Cross validate for 0: 4488.37780493
+Trained and found results for population 0: 4520.02317884
+ANN.py - Time to trainUntilConvergence: 31.388 sec.
+Trained model for population 1 in 31.390669024 sec
+Models to train: 63
+ANN.py - Time to trainUntilConvergence: 31.198 sec.
+Trained cv individual 0 in cv_predict: 31.200 sec.
+ANN.py - Time to trainUntilConvergence: 31.048 sec.
+Trained cv individual 1 in cv_predict: 31.050 sec.
+ANN.py - Time to trainUntilConvergence: 31.202 sec.
+Trained cv individual 2 in cv_predict: 31.204 sec.
+ANN.py - Time to trainUntilConvergence: 31.010 sec.
+Trained cv individual 3 in cv_predict: 31.012 sec.
+ANN.py - Time to trainUntilConvergence: 31.162 sec.
+Trained cv individual 4 in cv_predict: 31.164 sec.
+ANN.py - Time to trainUntilConvergence: 31.282 sec.
+Trained cv individual 5 in cv_predict: 31.285 sec.
+ANN.py - Time to trainUntilConvergence: 31.289 sec.
+Trained cv individual 6 in cv_predict: 31.291 sec.
+ANN.py - Time to trainUntilConvergence: 31.128 sec.
+Trained cv individual 7 in cv_predict: 31.130 sec.
+ANN.py - Time to trainUntilConvergence: 32.384 sec.
+Trained cv individual 8 in cv_predict: 32.387 sec.
+ANN.py - Time to trainUntilConvergence: 31.023 sec.
+Trained cv individual 9 in cv_predict: 31.025 sec.
+ANN.py - Time to trainUntilConvergence: 31.017 sec.
+Trained cv individual 10 in cv_predict: 31.019 sec.
+ANN.py - Time to trainUntilConvergence: 31.082 sec.
+Trained cv individual 11 in cv_predict: 31.084 sec.
+ANN.py - Time to trainUntilConvergence: 31.158 sec.
+Trained cv individual 12 in cv_predict: 31.160 sec.
+ANN.py - Time to trainUntilConvergence: 31.081 sec.
+Trained cv individual 13 in cv_predict: 31.083 sec.
+ANN.py - Time to trainUntilConvergence: 30.978 sec.
+Trained cv individual 14 in cv_predict: 30.980 sec.
+ANN.py - Time to trainUntilConvergence: 54.152 sec.
+Trained cv individual 15 in cv_predict: 54.154 sec.
