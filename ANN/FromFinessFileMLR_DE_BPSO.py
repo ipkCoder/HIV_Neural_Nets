@@ -243,7 +243,7 @@ def cv_predict(set_x, set_y, val_x, val_y, model, neurolabANN):
                 tar_ytrain             = np.array( [ np.array([np.array(y)]) for y in train_y ] );
                 normf                  = nl.tool.Norm(tar_ytrain)
                 tar_ytrain             = normf(tar_ytrain)
-                error_xtrain           = neurolabANN.train( inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
+                neurolabANN.train( inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
                 # Run trained ANN against individual extracted from training set
                 prediction_trainerror  = neurolabANN.sim(inp_xtrain_individual)
                 yhat[idx]              = prediction_trainerror[0][0]

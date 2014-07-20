@@ -66,7 +66,7 @@ def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
             inputranges                  = [[[-7, 7]] * inp_xtrain.shape[1]] * inp_xtrain.shape[0]
             net                          = nl.net.newff([[-7, 7]] * inp_xtrain.shape[1],[int(inp_xtrain.shape[1]), 1])
             # training on...training set
-            error_xtrain                 = net.train(inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
+            net.train(inp_xtrain, tar_ytrain, epochs=500, show=100, goal=1.0)
             # Run trained network on training set
             predict_ytrain               = net.sim(inp_xtrain)
             # Run trained network on validation set
