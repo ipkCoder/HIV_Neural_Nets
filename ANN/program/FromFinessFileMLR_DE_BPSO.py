@@ -7,6 +7,13 @@ import sys
 import hashlib
 from qsarHelpers import *
 
+# TODO: review evaluation formulas
+#         - need to document
+#         - names?
+#         - what are they?
+#         - understand what they mean
+#         - appropriate for non-linear models?
+
 #TODO: most of the time dealing with population is spent in cv_predict
 #      have to train number of models (one without each sample)
 #      dealing with one population member takes about five minutes
@@ -24,14 +31,18 @@ from qsarHelpers import *
 def r2(y, yHat):
     """Coefficient of determination"""
     numer = ((y - yHat)**2).sum()       # Residual Sum of Squares
-    denom = ((y - y.mean())**2).sum()
-    r2 = 1 - numer/denom
-    return r2
+    denom = ((y - y.mean())**2).sum()   # total variation in y
+    r2 = 1 - numer/denom                # all variation (minus) variation not described by model
+    return r2                           # variation described by model
+                                        #   - if 1, all variation described by model,
+                                        #     model would be perfect fit
+                                        #   - if 0, model can't explain any variation
+                                        #   = in y values
 #------------------------------------------------------------------------------
 
 def r2Pred(yTrain, yTest, yHatTest):
     numer = ((yHatTest - yTest)**2).sum()
-    denom = ((yTest - yTrain.mean())**2).sum()
+    denom = ((yTest - yTrain.mean())**2).sum()      # why this way?
     r2Pred = 1 - numer/denom
     return r2Pred
 
@@ -47,12 +58,14 @@ def see(p, y, yHat):
     denom = n - p - 1
     if (denom == 0):
         s = 0
-    elif ( (numer/denom) <0 ):
+    elif ( (numer/denom) < 0 ):
         s = 0.001
     else:
         s = (numer/denom)** 0.5
     return s
 #------------------------------------------------------------------------------
+
+# Purpose - compute standard deviation of predictions
 
 def sdep(y, yHat):
     """
