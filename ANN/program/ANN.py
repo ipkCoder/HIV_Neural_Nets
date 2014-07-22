@@ -25,13 +25,13 @@ class ANN:
         # create layer objects
         inLayer = LinearLayer(nFeatures, name="input")
         hiddenLayer = SigmoidLayer(hidden1Size, name="hidden1")
-        # hiddenLayer2 = SigmoidLayer(hidden2Size, name="hidden2")
+        #hiddenLayer2 = SigmoidLayer(hidden2Size, name="hidden2")
         outLayer = LinearLayer(nClasses, name="output")
             
         # add layers to feed forward network
         self.ffn.addInputModule(inLayer)
         self.ffn.addModule(hiddenLayer)
-        # self.ffn.addModule(hiddenLayer2)
+        #self.ffn.addModule(hiddenLayer2)
         self.ffn.addOutputModule(outLayer)
 
         # add bias unit to layers
@@ -39,7 +39,7 @@ class ANN:
 
         # establish connections between layers
         in_to_hidden = FullConnection(inLayer, hiddenLayer)
-        # hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
+        #hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
         hidden_to_out = FullConnection(hiddenLayer, outLayer)
 
         # print "into hidden: {}".format(len(in_to_hidden.params))
@@ -47,7 +47,7 @@ class ANN:
         
         # add connections to network
         self.ffn.addConnection(in_to_hidden)
-        # self.ffn.addConnection(hidden_to_hidden)
+        #self.ffn.addConnection(hidden_to_hidden)
         self.ffn.addConnection(hidden_to_out)
 
         # necessary, sort layers into correct/certain order

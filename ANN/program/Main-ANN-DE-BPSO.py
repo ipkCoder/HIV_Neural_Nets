@@ -8,7 +8,7 @@ from qsarHelpers import Timer
 #Local files created by me
 import ANN
 import FromDataFileMLR_DE_BPSO
-import FromFinessFileMLR_DE_BPSO_2 as FromFinessFileMLR_DE_BPSO
+import FromFinessFileMLR_DE_BPSO
 
 #------------------------------------------------------
 def getTwoDecPoint(x):
@@ -29,7 +29,7 @@ def createAnOutputFile():
         fileW = csv.writer(fileOut)
             
         try:
-            fileW.writerow(['Generation', 'Individual', 'Descriptor ID', 'No. Descriptors', 'Fitness', 'Model','R2', 'Q2', \
+            fileW.writerow(['Model', 'Generation', 'Individual', 'Descriptor ID', 'No. Descriptors', 'Fitness', 'R2', 'Q2', \
                 'R2Pred_Validation', 'R2Pred_Test','SEE_Train', 'SDEP_Validation', 'SDEP_Test', \
                 'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', 'yHat_Test'])
 
@@ -524,8 +524,9 @@ def main():
             # get training, validation, test data and rescale
             TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
             TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
-            TrainX = TrainX[:20]
-            TrainY = TrainY[:20]
+            
+            #TrainX = TrainX[:20]
+            #TrainY = TrainY[:20]
             print TrainX.shape
             print TrainY.shape
 

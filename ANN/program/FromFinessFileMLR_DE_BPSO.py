@@ -37,7 +37,7 @@ def r2(y, yHat):
                                         #   - if 1, all variation described by model,
                                         #     model would be perfect fit
                                         #   - if 0, model can't explain any variation
-                                        #   = in y values
+                                        #   - in y values
 #------------------------------------------------------------------------------
 
 def r2Pred(yTrain, yTest, yHatTest):
@@ -388,24 +388,29 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             # Compute predicted Y_hat for training set.
             Yhat_train                 = model.predict(X_train_masked)
             r2_train                   = r2(TrainY, Yhat_train)
+            
             # Standard error of estimate
             s                          = see(X_train_masked.shape[1], TrainY, Yhat_train)
             sdep_validation            = sdep(ValidateY, Yhat_validation)
             sdep_test                  = sdep(TrainY, Yhat_train)
-            idxLength                  = len(xi)
             
             # store stats
+            idxLength                  = len(xi)
             trackDesc[idx]             = str(xi)
             trackIdx[idx]              = idxLength
             trackFitness[idx]          = fitness[i]
             trackModel[idx]            = model_desc
-            trackR2[idx]               = r2_train
+            
             trackQ2[idx]               = q2_loo
+            
+            trackR2[idx]               = r2_train
             trackR2PredValidation[idx] = r2pred_validation
             trackR2PredTest[idx]       = r2pred_test
+            
             trackSEETrain[idx]         = s
             trackSDEPValidation[idx]   = sdep_validation
             trackSDEPTest[idx]         = sdep_test
+            
             yTrain[idx]                = TrainY.tolist()
             yHatTrain[idx]             = Yhat_train.tolist()
             yHatCV[idx]                = Yhat_cv.tolist()
@@ -413,10 +418,11 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             yHatValidation[idx]        = Yhat_validation.tolist()
             yTest[idx]                 = TestY.tolist()
             yHatTest[idx]              = Yhat_test.tolist()
+        
         print "Trained and found results for population {}: {}".format(i, t.interval)
 
         #printing the information into the file
-        write(fileW, generation, i, trackDesc[idx], trackIdx[idx], trackFitness[idx], trackModel[idx],
+        write(fileW, trackModel[idx], generation, i, trackDesc[idx], trackIdx[idx], trackFitness[idx],
             trackR2[idx], trackQ2[idx],trackR2PredValidation[idx], trackR2PredTest[idx], trackSEETrain[idx], \
             trackSDEPValidation[idx], trackSDEPTest[idx], yTrain[idx], yHatTrain[idx], yHatCV[idx], \
             yValidation[idx], yHatValidation[idx], yTest[idx], yHatTest[idx])
@@ -424,12 +430,12 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
     return itFits, fitness
 #------------------------------------------------------------------------------  
 #Ahmad Hadaegh: Modified  on: July 16, 2013
-def write(fileW, generation, individual, trackDesc, trackIdx, trackFitness, trackModel, trackR2, \
-          trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
+def write(fileW, model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
+          trackQ2, trackR2PredValidation, trackR2PredTest, trackSEETrain, \
           trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
           yValidation, yHatValidation, yTest, yHatTest): 
 
-    fileW.writerow([generation, individual, trackDesc, trackIdx, trackFitness, trackModel, trackR2, \
+    fileW.writerow([model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
         trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
         trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
         yValidation, yHatValidation, yTest, yHatTest])
