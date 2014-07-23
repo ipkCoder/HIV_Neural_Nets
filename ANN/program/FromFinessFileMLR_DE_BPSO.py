@@ -27,9 +27,9 @@ from qsarHelpers import *
 
 #------------------------------------------------------------------------------
 
-
 def r2(y, yHat):
     """Coefficient of determination"""
+
     numer = ((y - yHat)**2).sum()       # Residual Sum of Squares
     denom = ((y - y.mean())**2).sum()   # total variation in y
     r2 = 1 - numer/denom                # all variation (minus) variation not described by model
@@ -172,28 +172,6 @@ def r2p(r2, r2r):
     """
     r2p = r2*((r2 - r2r)**0.5)
     return r2p
-
-#------------------------------------------------------------------------------
-
-def rSquared(y, yPred):
-    """Find the coefficient  of correlation for an actual and predicted set.
-    
-    Parameters
-    ----------
-    y : 1D array -- Actual values.
-    yPred : 1D array -- Predicted values.
-    
-    Returns 
-    -------
-    out : float -- Coefficient  of correlation.
-    
-    """
-
-    rss = ((y - yPred)**2).sum()   # Residual Sum of Squares
-    sst = ((y - y.mean())**2).sum()   # Total Sum of Squares
-    r2 = 1 - (rss/sst)
-
-    return r2
 
 #------------------------------------------------------------------------------
 
