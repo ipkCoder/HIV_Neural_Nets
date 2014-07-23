@@ -415,7 +415,7 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                   localBestFitness,localBestMatrix, globalBestRow, \
                   globalBestFitness, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY):
     '''Performs core BPSO functions'''
-    numOfGenerations = 100
+    numOfGenerations = 2000            # should be 2000
     alphaStarts      = 0.5
     alphaEnds        = 0.33
     betaStarts       = 0
