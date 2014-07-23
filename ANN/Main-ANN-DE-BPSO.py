@@ -542,7 +542,7 @@ def main():
         with Timer() as t:
             fileW          = createAnOutputFile();
             model          = ANN.ANN();
-            numOfPop       = 25  # should be 50 population
+            numOfPop       = 50  # should be 50 population
             numOfFea       = 385  # should be 385 descriptors
             unfit          = 1000
             # Final model requirements
