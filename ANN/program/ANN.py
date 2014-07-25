@@ -14,10 +14,9 @@ class ANN:
     def __init__(self):
         self.name="ANN"
         
-    def get_params(self):
-        print self.ffn
-        return self.ffn.params
-      
+    def getParams(self):
+        return self.in_to_hidden.params, self.hidden_to_out.params
+    
     def create_network(self, nFeatures, hidden1Size=20, nClasses=1):
         # create network object
         self.ffn = FeedForwardNetwork()
@@ -38,17 +37,17 @@ class ANN:
         self.ffn.addModule(BiasUnit(name='bias'))
 
         # establish connections between layers
-        in_to_hidden = FullConnection(inLayer, hiddenLayer)
+        self.in_to_hidden = FullConnection(inLayer, hiddenLayer)
         #hidden_to_hidden = FullConnection(hiddenLayer, hiddenLayer2)
-        hidden_to_out = FullConnection(hiddenLayer, outLayer)
+        self.hidden_to_out = FullConnection(hiddenLayer, outLayer)
 
         # print "into hidden: {}".format(len(in_to_hidden.params))
         # print "into out: {}".format(len(hidden_to_out.params))
         
         # add connections to network
-        self.ffn.addConnection(in_to_hidden)
+        self.ffn.addConnection(self.in_to_hidden)
         #self.ffn.addConnection(hidden_to_hidden)
-        self.ffn.addConnection(hidden_to_out)
+        self.ffn.addConnection(self.hidden_to_out)
 
         # necessary, sort layers into correct/certain order
         self.ffn.sortModules()
