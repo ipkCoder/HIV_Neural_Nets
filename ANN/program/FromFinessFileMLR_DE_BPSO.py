@@ -307,8 +307,10 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
     trackDesc, trackIdx, trackFitness,trackModel,trackR2, trackQ2, \
     trackR2PredValidation, trackR2PredTest, trackSEETrain, \
     trackSDEPValidation, trackSDEPTest = InitializeTracks()
+    
     yTrain, yHatTrain, yHatCV, yValidation, \
     yHatValidation, yTest, yHatTest    = initializeYDimension()
+    
     unfit                              = 1000
     itFits                             = 1
     # analyze one population row at a time
@@ -347,25 +349,29 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             finally:
                 print "Cross validate for {}: {}".format(i, t0.interval)
 
+            # predict validation and test data using trained model
+            Yhat_train      = model.predict(X_train_masked)
             Yhat_validation = model.predict(X_validation_masked)
             Yhat_test       = model.predict(X_test_masked)
+            
             # Compute statistics for the coefficient of determination (R2)
             # i.e. Prediction for Validation and Test set
+            r2_train          = r2(TrainY, Yhat_train)
             q2_loo            = r2(TrainY, Yhat_cv)
             r2pred_validation = r2Pred(TrainY, ValidateY, Yhat_validation)
             r2pred_test       = r2Pred(TrainY, TestY, Yhat_test)
+            
+            # calculate fitness, use training and validation prediction/target values
             Y_fitness         = append(TrainY, ValidateY)
             Yhat_fitness      = append(Yhat_cv, Yhat_validation)
             fitness[i]        = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
+            
             # ignore and continue if predictive quality is too low
             # between either the training, cross-validation or test sets
             # i.e. if it's not worth recording, just return the fitness
             if predictive and ((q2_loo < 0.5) or (r2pred_validation < 0.5) or (r2pred_test < 0.5)):
                 print "ending the program, prediction is : ", predictive
                 continue;
-            # Compute predicted Y_hat for training set.
-            Yhat_train                 = model.predict(X_train_masked)
-            r2_train                   = r2(TrainY, Yhat_train)
             
             # Standard error of estimate
             s                          = see(X_train_masked.shape[1], TrainY, Yhat_train)
@@ -397,13 +403,15 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             yTest[idx]                 = TestY.tolist()
             yHatTest[idx]              = Yhat_test.tolist()
         
-        print "Trained and found results for population {}: {}".format(i, t.interval)
+            inToHiddenParams, inToOutParams        = model.getParams()
+
+        print "Trained and found results for population {}: {:.03} min".format(i, (t.interval/60))
 
         #printing the information into the file
         write(fileW, trackModel[idx], generation, i, trackDesc[idx], trackIdx[idx], trackFitness[idx],
             trackR2[idx], trackQ2[idx],trackR2PredValidation[idx], trackR2PredTest[idx], trackSEETrain[idx], \
             trackSDEPValidation[idx], trackSDEPTest[idx], yTrain[idx], yHatTrain[idx], yHatCV[idx], \
-            yValidation[idx], yHatValidation[idx], yTest[idx], yHatTest[idx])
+            yValidation[idx], yHatValidation[idx], yTest[idx], yHatTest[idx], inToHiddenParams, inToOutParams)
 
     return itFits, fitness
 #------------------------------------------------------------------------------  
@@ -411,10 +419,10 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
 def write(fileW, model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
           trackQ2, trackR2PredValidation, trackR2PredTest, trackSEETrain, \
           trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
-          yValidation, yHatValidation, yTest, yHatTest): 
+          yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams): 
 
     fileW.writerow([model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
         trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
         trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
-        yValidation, yHatValidation, yTest, yHatTest])
+        yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams])
     #fileOut.close()

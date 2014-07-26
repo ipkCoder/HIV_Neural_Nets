@@ -79,8 +79,8 @@ class ANN:
                 self.trainer.trainUntilConvergence(trainingData=self.train_ds, validationData=self.validate_ds, maxEpochs=500, continueEpochs=10)
         except:
             print "Error occured while training model in ANN."
-        finally:
-            print("ANN.py - Time to trainUntilConvergence: {:.03f} sec.".format(t.interval))
+        #finally:
+        #    print("ANN.py - Time to trainUntilConvergence: {:.03f} sec.".format(t.interval))
 
         return 'ANN'
 

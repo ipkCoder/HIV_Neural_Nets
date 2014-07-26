@@ -9,7 +9,6 @@ from qsarHelpers import Timer
 import ANN
 import FromDataFileMLR_DE_BPSO
 import FromFinessFileMLR_DE_BPSO
-
 #------------------------------------------------------
 def getTwoDecPoint(x):
     return float("%.2f"%x)
@@ -31,7 +30,8 @@ def createAnOutputFile():
         try:
             fileW.writerow(['Model', 'Generation', 'Individual', 'Descriptor ID', 'No. Descriptors', 'Fitness', 'R2', 'Q2', \
                 'R2Pred_Validation', 'R2Pred_Test','SEE_Train', 'SDEP_Validation', 'SDEP_Test', \
-                'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', 'yHat_Test'])
+                'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', 'yHat_Test', \
+                'In to Hidden Weights', 'In to Out Weights'])
 
         except:
             print("couldn't write to file")
@@ -40,7 +40,7 @@ def createAnOutputFile():
         print "error creting outout file"
 #------------------------------------------------------------------------------
 
-# error with predicting X_validation_masked
+# calculate fitness of a new potential individual
 
 def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
 
@@ -62,8 +62,6 @@ def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
     Yhat_cv = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)
     Yhat_validation = model.predict(X_validation_masked)
 
-    print "Predicted in findFitnessOfARow"
-
     Y_fitness = append(TrainY, ValidateY)
     Yhat_fitness = append(Yhat_cv, Yhat_validation)
     fitness = FromFinessFileMLR_DE_BPSO.calc_fitness(xi, Y_fitness, Yhat_fitness, c=2)
@@ -81,13 +79,13 @@ def equal(V1, V2):
 
 #------------------------------------------------------
 def theRowIsUniqueInPop(RowI,V, population):
-    numOfPop = population.shape[0]
-    numOfFea = population.shape[1]
+
     unique = 1
-    for i in range(RowI-1):
-        for j in range(numOfFea): # why have j, not used????
-            if (equal (V, population[i])):
-                return (not unique)
+    # compae V to each individual before it
+    for i in range(RowI):
+        if (equal (V, population[i])):
+            return (not unique)
+    
     return unique
 
 #------------------------------------------------------------------------------
@@ -191,10 +189,9 @@ def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
     '''Core DE algoritm finds a candidate solution(agent) 
         among the population.'''
     numOfFea = P.shape[0]
+    U = zeros(numOfFea)
+
     CRrate   = 0.8 #it is a common value when we do DE algorithm
-    U        = zeros(numOfFea)
-    
-    # create new vector with different set of features (combo of P and V)
     for j in range(numOfFea):
         R = random.uniform(0, 1)
         if (R < CRrate):
@@ -275,7 +272,9 @@ def findTheRightVector(rowI, parentPop, fitness, model, \
     for j in range(numOfFea):
        P[j] = parentPop[rowI][j]
   
-    # find new row combination by using mutation function on three randowm rows and using cross over function, if new row has lower fitness return new row, else return old row
+    # find new row combination by using mutation function on three randowm rows
+    # and using cross over function. If new row has lower/better fitness,  
+    # return new row, else return old row
     while (U.sum() < 3):
         V1, V2, V3   = selectThreeRandomRows(parentPop)
         V            = mutate(V1, V2, V3)
@@ -347,7 +346,9 @@ def findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
   
     num = int(numOfPop * 0.2)
     for i in range(num, numOfPop):
+        
         popI           = getPopulationI(parentPop[i])
+        
         # find vector based on mutation and crossover of population row
         theRightVector = findTheRightVector(i, parentPop, fitness, \
                                  model, TrainX, TrainY, ValidateX, ValidateY )
@@ -434,7 +435,7 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
 
                 # terminate if golbalBestFitness hasn't changed in 30 generations
                 oldFitness, Times = checkterTerminationStatus(Times, oldFitness, globalBestFitness)
-                print "This is iteration {}, Fitness is: {}".format(i,globalBestFitness); 
+                print "This is iteration {}, Global best fitness is: {}".format(i,globalBestFitness); 
                 unfit         = 1000
                 fittingStatus = unfit
                 # find new population matrix and fitness vector
@@ -442,10 +443,10 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                     try:
                         with Timer() as t1:
                             population = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
-                                        population,localBestMatrix, globalBestRow, \
-                                        TrainX, TrainY, ValidateX, ValidateY)
+                                             population,localBestMatrix, globalBestRow, \
+                                             TrainX, TrainY, ValidateX, ValidateY)
                     finally:
-                        print "New pop found in {} min".format((t1.interval/60))
+                        print "--------- New pop found in {} min --------".format((t1.interval/60))
             
                     try:
                         with Timer() as t1:
@@ -525,8 +526,8 @@ def main():
             TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
             TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
             
-            #TrainX = TrainX[:20]
-            #TrainY = TrainY[:20]
+            #TrainX = TrainX[:10]
+            #TrainY = TrainY[:10]
             print TrainX.shape
             print TrainY.shape
 
