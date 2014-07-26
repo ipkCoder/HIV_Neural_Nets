@@ -9,6 +9,8 @@
 # Licence:     MIT
 #-------------------------------------------------------------------------------
 import numpy as np
+import argparse
+import random
 import math
 from ImportData import *
 import sys
@@ -150,26 +152,44 @@ def getCosts(X,y,sigma):
 # main function
 def main():
   try:
+      
+    parser = argparse.ArgumentParser()
+    parser.add_argument("min", type=int, help="min random sigma")
+    parser.add_argument("max", type=int, help="max random sigma")
+    args = parser.parse_args()
 
     data, targets = getAllOfTheData()
 
     data = rescaleTheData(data)
 
+    #n = 20
+    #data = data[:n]
+    #targets = targets[:n]
+
+    #index = random.sample(range(385), 385)
+    #print index
+    #data = data.T[index, :].T
+
     sample_size, feature_size = data.shape
 
     print(sample_size, feature_size)
 
-    # set initial sigmas
-    sigmas = np.random.randint(1000, 50000, feature_size)
-    #sigmas = np.random.random(feature_size);
+    min_sigma = 1
+    max_sigma = 1000
 
-#    print sigmas
+    # set initial sigmas
+    sigmas = np.random.randint(args.min, args.max, feature_size)
+    #sigmas = np.random.random(feature_size);
+    #print sigmas
+    
+    print("Min and max sigmas: {}, {}".format(args.min, args.max))
 
     assert len(sigmas) == feature_size
 
     distance = computeDistances(data, sigmas)
 
-    print distance
+    #print("Distances: ")
+    #print distance
 
     numerator   = getSummationLayerNumerator(targets, distance)
     denominator = getSummationLayerDenominator(distance)
@@ -179,16 +199,13 @@ def main():
     print("Denominators:")
     print denominator
     
-    yHat = outputLayer(numerator, denominator)
-    print len(yHat)
-#    exp_dist = np.exp(-distance)
-#    print exp_dist
+    yHat = numerator/denominator #outputLayer(numerator, denominator)
 
     print("  Actual\tPredicted")
-    for i in range(sample_size):
-        print i, targets[i], yHat[i]
+    for i in range(sample_size/5):
+        print("{}, {:.04}, {}".format(i, targets[i], yHat[i]))
 
-
+# =============================================================
     # unlabeled training set (X) to classify
     X = np.array([[1.0,2.0,3.0,4.0,5.0],
                   [1.0,1.0,1.0,1.0,1.0],
@@ -238,3 +255,7 @@ def main():
 # ================================================================================
 if __name__ == '__main__':
   main();
+
+
+
+
