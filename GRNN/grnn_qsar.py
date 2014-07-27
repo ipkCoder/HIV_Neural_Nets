@@ -20,35 +20,46 @@ import sys
 
 # =========== Notes =====================
 
+# To launch program, provide min and max sigmas
+#    - ex: python grnn_qsar.py 2 100
+
 # Prediction of target values are prefect, need to figure out why
 # When change sigmas to a different range, numerators and denominators adjust
 # Even with different sigmas, predictions remain perfect
 
 # =======================================
 # 
-# Purpose: find weighted euclidean distance between all samples
+# Purpose: find weighted euclidean distance between two samples
 
-# @param x1 - x sample vector for which to compute predicted value
-# @param x2 - other x sample in dataset
-# @paramsigma - vector of weights (each weight corresponds to specific feature)
+# @param x1        - sample 1
+# @param x2        - sample 2
+# @param sigma     - vector of weights (each weight corresponds to specific feature)
 # @return distance - squared weighted euclidean distance (single value)
 
 def squareWeightedEuclideanDistance(x1, x2, sigma):
+    
     '''Get the squared weighted Euclidean distance between all samples'''
     # should assert that x1, x2, sigma of are same length
     try:
         squared_weighted_dist = ((x1-x2)/sigma)**2
-#        print squared_weighted_dist
-        # if one of distances between features was divided by 0, set to big number
+
+        # if one of sigmas was super small, may have caused one of distances 
+        # between features to become infinity. If so, just set to big number
         squared_weighted_dist[squared_weighted_dist == np.inf] = 10000000
+        
         distance = sum(squared_weighted_dist)
+        
         return distance;
+    
     except:
         print "Error calculating squared weighted Euclidean Distance"
+# ==============================================================================
 
-# compute disctances between all samples in dataset
+# Purpose: compute disctances between all samples in dataset
+
 # @local euclidean_distance - (matrix)
 #   - euclidean_distance[i][j] : square weighted euclidean distance between sample_i and sample_j
+
 def computeDistances(data, sigma):
 
     sample_size = data.shape[0]
@@ -60,10 +71,12 @@ def computeDistances(data, sigma):
             try:
                 euclidean_distance[i][j] = squareWeightedEuclideanDistance(data[i], data[j], sigma)
             except:
-                print("error calculating distances between {0} and {1}".format(i, j))
+                print("Error calculating distances between {0} and {1}".format(i, j))
 
     return euclidean_distance
 # ================================================================================
+
+# Purpose: calculate numerators of all predicted target values
 
 # @param y          - (vector) actual y values
 # @param distance   - (matrix) squared weighted euclidean distance between samples
@@ -82,9 +95,10 @@ def getSummationLayerNumerator(y, distance):
         print "Error calculating summation layer numerator"
 # ================================================================================
 
+# Purpose: calculate denominators of all predicted target values
+
 # @param distance - (matrix) squared weighted euclidean distance between samples
 # @return         - (vector) denominator of predicted y values
-#                 - for each y, predicted y is weighted sum of all ys
 
 def getSummationLayerDenominator(distance):
     '''Get the summation layer denominator (see eq.6 / 11)'''
@@ -94,16 +108,19 @@ def getSummationLayerDenominator(distance):
         print "Error getting summation layer denominator."
 # ================================================================================
 
+# Purpose: calculate predicted target values
+
 # @param numerator   - (vector) numerator from summation layer
 # @param denominator - (vector) denominator from summation layer
-# @return      - (vector) predicted y values for each sample
+# @return            - (vector) predicted y values for each sample
+#                      - for each y, predicted y is weighted sum of all ys
+
 def outputLayer(numerator, denominator):
     '''Divide numerator and denominator from summation layer'''
     try:
-        yHat = numerator/denominator
-        return yHat
+        return numerator/denominator
     except:
-        print "Error predicting Y-hats in summation layer";
+        print "Error predicting Y-hats in output layer";
 # ================================================================================
 
 # y - is y a vector or single value?
@@ -150,6 +167,7 @@ def getCosts(X,y,sigma):
     print "Error computing cost";
 # ================================================================================
 # main function
+
 def main():
   try:
       
