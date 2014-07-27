@@ -208,7 +208,7 @@ def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
         return V, fitnessV
     
 #------------------------------------------------------
-def mutate(V1, V2, V3):
+def mutate(V1, V2, V3, F = 0.5):
     '''Creates a mutant variant feature descriptor 
     row vector from a set of three mutually distinct 
     candidate row vectors.'''
@@ -217,9 +217,6 @@ def mutate(V1, V2, V3):
     # Formally 'F' is defined as the differential weight,
     # a tuning parameter, i.e. a constant, applied in the context of DE 
     # crossover and mutation functions.
-    # TODO: This should be passed as an a function parameter
-    # with a default value set to 0.5
-    F        = 0.5
     V        = zeros(numOfFea)
     for i in range (numOfFea):
         V[i] = V3[i] + (F *(V2[i] - V1[i]))
@@ -276,9 +273,14 @@ def findTheRightVector(rowI, parentPop, fitness, model, \
     # and using cross over function. If new row has lower/better fitness,  
     # return new row, else return old row
     while (U.sum() < 3):
+        # The provisional individual (x'_i) is determined by three 
+        # mutually distinct individuals V1(x_r), V2(x_s) and V3(x_t) from the previous 
+        # generation.
         V1, V2, V3   = selectThreeRandomRows(parentPop)
-        V            = mutate(V1, V2, V3)
-        U, fitnessU  = crossover(P, V, model,TrainX, TrainY, ValidateX, ValidateY)
+        # The scaling factor 'F' controls the length of the
+        # exploration vector (x_r - x_s)
+        provisional  = mutate(V1, V2, V3, F = 0.5)
+        U, fitnessU  = crossover(P, provisional, model,TrainX, TrainY, ValidateX, ValidateY)
   
     if (fitnessU < fitnessP):
         return U
