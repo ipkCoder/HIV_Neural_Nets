@@ -14,12 +14,8 @@ import random
 import math
 from ImportData import *
 import sys
-
 # ======= Regarding TODOs ===============
-
-
 # =========== Notes =====================
-
 # To launch program, provide min and max sigmas
 #    - ex: python grnn_qsar.py 2 100
 
@@ -28,16 +24,12 @@ import sys
 # Even with different sigmas, predictions remain perfect
 
 # =======================================
-# 
 # Purpose: find weighted euclidean distance between two samples
-
 # @param x1        - sample 1
 # @param x2        - sample 2
 # @param sigma     - vector of weights (each weight corresponds to specific feature)
 # @return distance - squared weighted euclidean distance (single value)
-
 def squareWeightedEuclideanDistance(x1, x2, sigma):
-    
     '''Get the squared weighted Euclidean distance between all samples'''
     # should assert that x1, x2, sigma of are same length
     try:
@@ -56,10 +48,8 @@ def squareWeightedEuclideanDistance(x1, x2, sigma):
 # ==============================================================================
 
 # Purpose: compute disctances between all samples in dataset
-
 # @local euclidean_distance - (matrix)
 #   - euclidean_distance[i][j] : square weighted euclidean distance between sample_i and sample_j
-
 def computeDistances(data, sigma):
 
     sample_size = data.shape[0]
@@ -69,7 +59,11 @@ def computeDistances(data, sigma):
     for i in range(sample_size):
         for j in range(sample_size):
             try:
-                euclidean_distance[i][j] = squareWeightedEuclideanDistance(data[i], data[j], sigma)
+                # Don't need to take euclidean_distance from yourself
+                if np.array_equiv(data[i],data[j]):
+                    continue;
+                else:
+                    euclidean_distance[i][j] = squareWeightedEuclideanDistance(data[i], data[j], sigma)
             except:
                 print("Error calculating distances between {0} and {1}".format(i, j))
 
@@ -176,7 +170,7 @@ def main():
     parser.add_argument("max", type=int, help="max random sigma")
     args = parser.parse_args()
 
-    data, targets = getAllOfTheData()
+    data, target_y = getAllOfTheData()
 
     data = rescaleTheData(data)
 
@@ -204,24 +198,33 @@ def main():
 
     assert len(sigmas) == feature_size
 
-    distance = computeDistances(data, sigmas)
+    distances = computeDistances(data, sigmas)
 
     #print("Distances: ")
     #print distance
 
-    numerator   = getSummationLayerNumerator(targets, distance)
-    denominator = getSummationLayerDenominator(distance)
+    # iterate over all 'x' observation's distances from each other observation 'x'
+    yHat = []
+    print("Observation 'x' ID\tActual\tPredicted")
+    for idx,observation in enumerate(distances):
+        numerator   = getSummationLayerNumerator(target_y, observation)
+        denominator = getSummationLayerDenominator(observation)
+        yHat.append(numerator/denominator)
+        print("{}\t{:.04}\t{:.04}".format(idx, target_y[idx], yHat[idx]))
 
-    print("Numerators:")
-    print numerator
-    print("Denominators:")
-    print denominator
+    #numerator   = getSummationLayerNumerator(target_y, distances)
+    #denominator = getSummationLayerDenominator(distances)
+
+    #print("Numerators:")
+    #print numerator
+    #print("Denominators:")
+    #print denominator
     
-    yHat = numerator/denominator #outputLayer(numerator, denominator)
+    #yHat = numerator/denominator #outputLayer(numerator, denominator)
 
-    print("  Actual\tPredicted")
-    for i in range(sample_size/5):
-        print("{}, {:.04}, {}".format(i, targets[i], yHat[i]))
+    #print("  Actual\tPredicted")
+    #for i in range(sample_size/5):
+        #print("{}, {:.04}, {}".format(i, target_y[i], yHat[i]))
 
 # =============================================================
     # unlabeled training set (X) to classify
