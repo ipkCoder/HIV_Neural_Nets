@@ -28,10 +28,10 @@ def createAnOutputFile():
         fileW = csv.writer(fileOut)
             
         try:
-            fileW.writerow(['Model', 'Generation', 'Individual', 'Descriptor ID', 'No. Descriptors', 'Fitness', 'R2', 'Q2', \
-                'R2Pred_Validation', 'R2Pred_Test','SEE_Train', 'SDEP_Validation', 'SDEP_Test', \
-                'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', 'yHat_Test', \
-                'In to Hidden Weights', 'In to Out Weights'])
+            fileW.writerow(['Model', 'Generation', 'Individual', 'Descriptor ID', 'No. Descriptors', 'Fitness', \
+                'R2Pred_Train', 'Q2_Train', 'R2Pred_Validation', 'R2Pred_Test','SDEP_Train', 'SDEP_Validation', \
+                'SDEP_Test', 'y_Train', 'yHat_Train', 'yHat_CV', 'y_validation', 'yHat_validation','y_Test', \
+                'yHat_Test', 'In to Hidden Weights', 'In to Out Weights'])
 
         except:
             print("couldn't write to file")

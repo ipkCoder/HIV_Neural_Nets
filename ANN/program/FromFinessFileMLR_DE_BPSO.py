@@ -41,6 +41,7 @@ def r2(y, yHat):
 #------------------------------------------------------------------------------
 
 def r2Pred(yTrain, yTest, yHatTest):
+
     numer = ((yHatTest - yTest)**2).sum()
     denom = ((yTest - yTrain.mean())**2).sum()      # why this way?
     r2Pred = 1 - numer/denom
@@ -267,11 +268,11 @@ def InitializeTracks():
     trackQ2 = {}
     trackR2PredValidation = {}
     trackR2PredTest = {}
-    trackSEETrain = {}
+    trackSDEPTrain = {}
     trackSDEPValidation = {}
     trackSDEPTest = {}
     return  trackDesc, trackIdx, trackFitness, trackModel, trackR2, trackQ2, \
-            trackR2PredValidation, trackR2PredTest, trackSEETrain, \
+            trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
             trackSDEPValidation, trackSDEPTest
 #------------------------------------------------------------------------------
 #Ahmad Hadaegh: Modified  on: July 16, 2013
@@ -305,7 +306,7 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
   
     # create empty dictionaries to hold data
     trackDesc, trackIdx, trackFitness,trackModel,trackR2, trackQ2, \
-    trackR2PredValidation, trackR2PredTest, trackSEETrain, \
+    trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
     trackSDEPValidation, trackSDEPTest = InitializeTracks()
     
     yTrain, yHatTrain, yHatCV, yValidation, \
@@ -373,10 +374,10 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
                 print "ending the program, prediction is : ", predictive
                 continue;
             
-            # Standard error of estimate
-            s                          = see(X_train_masked.shape[1], TrainY, Yhat_train)
+            # Standard error of estimate (RMSE)
+            sdep_train                 = sdep(TrainY, Yhat_train)
             sdep_validation            = sdep(ValidateY, Yhat_validation)
-            sdep_test                  = sdep(TrainY, Yhat_train)
+            sdep_test                  = sdep(TestY, Yhat_test)
             
             # store stats
             idxLength                  = len(xi)
@@ -391,7 +392,7 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             trackR2PredValidation[idx] = r2pred_validation
             trackR2PredTest[idx]       = r2pred_test
             
-            trackSEETrain[idx]         = s
+            trackSDEPTrain[idx]        = sdep_train
             trackSDEPValidation[idx]   = sdep_validation
             trackSDEPTest[idx]         = sdep_test
             
@@ -409,7 +410,7 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
 
         #printing the information into the file
         write(fileW, trackModel[idx], generation, i, trackDesc[idx], trackIdx[idx], trackFitness[idx],
-            trackR2[idx], trackQ2[idx],trackR2PredValidation[idx], trackR2PredTest[idx], trackSEETrain[idx], \
+            trackR2[idx], trackQ2[idx],trackR2PredValidation[idx], trackR2PredTest[idx], trackSDEPTrain[idx], \
             trackSDEPValidation[idx], trackSDEPTest[idx], yTrain[idx], yHatTrain[idx], yHatCV[idx], \
             yValidation[idx], yHatValidation[idx], yTest[idx], yHatTest[idx], inToHiddenParams, inToOutParams)
 
@@ -417,12 +418,12 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
 #------------------------------------------------------------------------------  
 #Ahmad Hadaegh: Modified  on: July 16, 2013
 def write(fileW, model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
-          trackQ2, trackR2PredValidation, trackR2PredTest, trackSEETrain, \
+          trackQ2, trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
           trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
           yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams): 
 
     fileW.writerow([model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
-        trackQ2,trackR2PredValidation, trackR2PredTest, trackSEETrain, \
+        trackQ2,trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
         trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
         yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams])
     #fileOut.close()
