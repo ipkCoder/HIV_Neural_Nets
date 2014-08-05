@@ -43,7 +43,7 @@ def createAnOutputFile():
 # calculate fitness of a new potential individual
 
 def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
-
+ 
     xi = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
 
     # select features from samples
@@ -325,7 +325,7 @@ def getTheBestRowAndThreeRandomRows(fitness, parentPop):
     for i in range(1,num):
         V = getAValidRow(population)
         while (V.sum() < 3) or (rowExistInParentPop(V, parentPop)):
-            V1 = getAValidRow(population) # what is V1??? ---------------
+            V = getAValidRow(population)
         for j in range(numOfFea):
             population[i][j] = V[j]
             
@@ -352,9 +352,20 @@ def findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
         popI           = getPopulationI(parentPop[i])
         
         # find vector based on mutation and crossover of population row
-        theRightVector = findTheRightVector(i, parentPop, fitness, \
-                                 model, TrainX, TrainY, ValidateX, ValidateY )
-      
+        print("Finding individual {}".format(i))
+        error = 0
+        try:
+            with Timer() as t:
+                theRightVector = findTheRightVector(i, parentPop, fitness, \
+                                     model, TrainX, TrainY, ValidateX, ValidateY )
+        except:
+            print("Error finding new individual")
+            error = 1
+        finally:
+            if not error:
+                print("Found individual {} in {:.03f} min".format(i, (t.interval/60)))
+
+        
         # find new population row column values
         for j in range(numOfFea):
             if (velocity[i][j] > 0) and (velocity[i][j] <= alpha):
@@ -438,11 +449,13 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                 # terminate if golbalBestFitness hasn't changed in 30 generations
                 oldFitness, Times = checkterTerminationStatus(Times, oldFitness, globalBestFitness)
                 print "This is iteration {}, Global best fitness is: {}".format(i,globalBestFitness); 
+                
                 unfit         = 1000
                 fittingStatus = unfit
                 # find new population matrix and fitness vector
                 while (fittingStatus == unfit):
-                    try:
+                    try:    
+                        print("Finding new population")
                         with Timer() as t1:
                             population = findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
                                              population,localBestMatrix, globalBestRow, \
@@ -455,7 +468,11 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
                             fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(i+1, model,fileW, \
                                         population, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
                     finally:
-                        print "Validated model in {} min".format((t1.interval/60))      
+                        if fittingStatus == unfit:
+                            print("Error validating model: finding new population to validate.")
+                        else:
+                            print "Validated model in {} min".format((t1.interval/60))      
+                
                 #remember current population matrix
                 parentPop                         = getParentPopulation(population)
                 # find new global best row and fitness
@@ -517,7 +534,7 @@ def main():
         with Timer() as t:
             fileW      = createAnOutputFile();
             model      = ANN.ANN();
-            numOfPop   = 50  # should be 50 population
+            numOfPop   = 6  # should be 50 population
             numOfFea   = 385  # old data (396), new data (385)
             unfit      = 1000
             # Final model requirements
@@ -528,8 +545,8 @@ def main():
             TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
             TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
             
-            #TrainX = TrainX[:10]
-            #TrainY = TrainY[:10]
+            TrainX = TrainX[:10]
+            TrainY = TrainY[:10]
             print TrainX.shape
             print TrainY.shape
 
@@ -549,7 +566,7 @@ def main():
                 fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(0, model,fileW, population, 
                     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
     finally:
-        print "Validated model: {} min".format((t.interval/60))
+        print "Initialized population and validated model: {} min".format((t.interval/60))
 
     try:
         with Timer() as t:
