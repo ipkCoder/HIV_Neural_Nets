@@ -7,8 +7,8 @@ from qsarHelpers import Timer
 
 #Local files created by me
 import ANN
-import FromDataFileMLR_DE_BPSO
-import FromFinessFileMLR_DE_BPSO
+import FromDataFile_ANN_DE_BPSO
+import FromFitnessFile_ANN_DE_BPSO
 #------------------------------------------------------
 def getTwoDecPoint(x):
     return float("%.2f"%x)
@@ -44,7 +44,7 @@ def createAnOutputFile():
 
 def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
  
-    xi = FromFinessFileMLR_DE_BPSO.OnlySelectTheOnesColumns(vector)
+    xi = FromFitnessFile_ANN_DE_BPSO.OnlySelectTheOnesColumns(vector)
 
     # select features from samples
     X_train_masked = TrainX.T[xi].T
@@ -59,12 +59,12 @@ def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
     except:
         print "Error training in findFitnessOfARow"
 
-    Yhat_cv = FromFinessFileMLR_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)
+    Yhat_cv = FromFitnessFile_ANN_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)
     Yhat_validation = model.predict(X_validation_masked)
 
     Y_fitness = append(TrainY, ValidateY)
     Yhat_fitness = append(Yhat_cv, Yhat_validation)
-    fitness = FromFinessFileMLR_DE_BPSO.calc_fitness(xi, Y_fitness, Yhat_fitness, c=2)
+    fitness = FromFitnessFile_ANN_DE_BPSO.calc_fitness(xi, Y_fitness, Yhat_fitness, c=2)
 
     return fitness
 #------------------------------------------------------------------------------
@@ -465,7 +465,7 @@ def IterateNtimes(model, fileW, fitness, velocity, population, parentPop,
             
                     try:
                         with Timer() as t1:
-                            fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(i+1, model,fileW, \
+                            fittingStatus, fitness = FromFitnessFile_ANN_DE_BPSO.validate_model(i+1, model,fileW, \
                                         population, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
                     finally:
                         if fittingStatus == unfit:
@@ -534,7 +534,7 @@ def main():
         with Timer() as t:
             fileW      = createAnOutputFile();
             model      = ANN.ANN();
-            numOfPop   = 6  # should be 50 population
+            numOfPop   = 50  # should be 50 population
             numOfFea   = 385  # old data (396), new data (385)
             unfit      = 1000
             # Final model requirements
@@ -542,11 +542,11 @@ def main():
             R2req_validate = .5
             R2req_test     = .5
             # get training, validation, test data and rescale
-            TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFileMLR_DE_BPSO.getAllOfTheData()
-            TrainX, ValidateX, TestX                           = FromDataFileMLR_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
+            TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = FromDataFile_ANN_DE_BPSO.getAllOfTheData()
+            TrainX, ValidateX, TestX                           = FromDataFile_ANN_DE_BPSO.rescaleTheData(TrainX, ValidateX, TestX)
             
-            TrainX = TrainX[:10]
-            TrainY = TrainY[:10]
+            #TrainX = TrainX[:10]
+            #TrainY = TrainY[:10]
             print TrainX.shape
             print TrainY.shape
 
@@ -563,7 +563,7 @@ def main():
             while (fittingStatus == unfit):
                 # create inititial population and find fitness for each row in population
                 population             = createInitPopMat(numOfPop, numOfFea)
-                fittingStatus, fitness = FromFinessFileMLR_DE_BPSO.validate_model(0, model,fileW, population, 
+                fittingStatus, fitness = FromFitnessFile_ANN_DE_BPSO.validate_model(0, model,fileW, population, 
                     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
     finally:
         print "Initialized population and validated model: {} min".format((t.interval/60))

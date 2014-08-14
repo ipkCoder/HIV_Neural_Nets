@@ -106,7 +106,7 @@ class ANN:
 
 # ============ Test class =============
 # if __name__ == '__main__':
-#     import FromDataFileMLR_DE_BPSO as fdf
+#     import FromDataFile_ANN_DE_BPSO as fdf
 #     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = fdf.getAllOfTheData()
 #     TrainX, ValidateX, TestX                           = fdf.rescaleTheData(TrainX, ValidateX, TestX)
 
