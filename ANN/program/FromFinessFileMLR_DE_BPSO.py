@@ -77,7 +77,7 @@ def sdep(y, yHat):
 
     numer = ((y - yHat)**2).sum()
 
-    sdep = (numer/n)**0.5
+    sdep = (numer/n)**0.5  # square root
 
     return sdep
 #------------------------------------------------------------------------------
@@ -215,7 +215,7 @@ def rmse(X, Y):
 def cv_predict(set_x, set_y, val_x, val_y, model):
     """Predict using cross validation."""
     
-    print "Models to train: {}".format(set_x.shape[0])
+    #print "Models to train: {}".format(set_x.shape[0])
 
     yhat = empty_like(set_y)
     
@@ -228,8 +228,8 @@ def cv_predict(set_x, set_y, val_x, val_y, model):
                 yhat[idx] = model.predict(set_x[idx])
         except:
             print "Error with training cv model for sample {}".format(idx)
-        finally:
-            print("Trained cv individual {} in cv_predict: {:.03f} sec.".format( idx,t.interval))
+        #finally:
+            #print("Trained cv individual {} in cv_predict: {:.03f} sec.".format( idx,t.interval))
     return yhat
 #------------------------------------------------------------------------------
 #Ahmad Hadaegh: Modified  on: July 16, 2013
