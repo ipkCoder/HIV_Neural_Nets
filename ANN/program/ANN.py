@@ -76,13 +76,20 @@ class ANN:
         self.trainer = BackpropTrainer(self.ffn, learningrate=.0775, momentum=.1)
         try:
             with Timer() as t:
-                self.trainer.trainUntilConvergence(trainingData=self.train_ds, validationData=self.validate_ds, maxEpochs=500, continueEpochs=10)
+                self.train_errors, self.val_errors \
+                    = self.trainer.trainUntilConvergence(trainingData=self.train_ds, \
+                                                         validationData=self.validate_ds, \
+                                                         maxEpochs=500, \
+                                                         continueEpochs=10)
+
+            return self.train_errors, self.val_errors
         except:
             print "Error occured while training model in ANN."
+        
         #finally:
         #    print("ANN.py - Time to trainUntilConvergence: {:.03f} sec.".format(t.interval))
 
-        return 'ANN'
+        #return 'ANN'
 
     # predict depenent variable for dataset
     def predict(self, data):
@@ -94,6 +101,50 @@ class ANN:
             for i in range(data.shape[0]):
                 outputs[i] = self.ffn.activate(data[i])
             return outputs
+
+
+
+# ============ Test class =============
+# if __name__ == '__main__':
+#     import FromDataFileMLR_DE_BPSO as fdf
+#     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = fdf.getAllOfTheData()
+#     TrainX, ValidateX, TestX                           = fdf.rescaleTheData(TrainX, ValidateX, TestX)
+
+#     ann = ANN()
+#     ann.create_network(TrainX.shape[1], 20, 1)
+#     train_errors, val_errors = ann.train(TrainX, TrainY, ValidateX, ValidateY)
+#     predictions = ann.predict(TestX)
+
+#     for i in range(TestX.shape[0]):
+#         print predictions[i], TestY[i]
+    
+
+# ============== pycallgraph ===============
+# from pycallgraph import PyCallGraph
+# from pycallgraph import Config
+# from pycallgraph import GlobbingFilter
+# from pycallgraph.output import GraphvizOutput
+
+# config = Config(max_depth=4)
+# config.trace_filter = GlobbingFilter(
+#         exclude=[
+#         'pycallgraph.*',
+#     ])
+    
+# graphviz = GraphvizOutput(output_file='ANN.png')
+
+# with PyCallGraph(output=graphviz, config=config):
+    
+#     TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = fdf.getAllOfTheData()
+#     TrainX, ValidateX, TestX                           = fdf.rescaleTheData(TrainX, ValidateX, TestX)
+
+#     ann = ANN()
+#     ann.create_network(TrainX.shape[1], 20, 1)
+#     train_errors, val_errors = ann.train(TrainX, TrainY, ValidateX, ValidateY)
+#     predictions = ann.predict(TestX)
+
+
+
 
 
 
