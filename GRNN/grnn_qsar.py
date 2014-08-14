@@ -14,6 +14,7 @@ import random
 import math
 from ImportData import *
 import sys
+
 # ======= Regarding TODOs ===============
 # =========== Notes =====================
 # To launch program, provide min and max sigmas
@@ -83,7 +84,7 @@ def getSummationLayerNumerator(y, distance):
 
     try:
         # multiply y vector along x axis
-        numerator = sum(y * np.exp(-distance).T)
+        numerator = sum(y * np.exp(-distance))
         return numerator
     except:
         print "Error calculating summation layer numerator"
@@ -117,6 +118,44 @@ def outputLayer(numerator, denominator):
         print "Error predicting Y-hats in output layer";
 # ================================================================================
 
+def makePredictions(distances, target_y):
+    
+    # iterate over all 'x' observation's distances from each other observation 'x'
+    yHat = np.zeros(len(target_y))
+    #print("Observation 'x' ID\tActual\tPredicted")
+    for idx,observation in enumerate(distances):
+        numerator   = getSummationLayerNumerator(target_y, observation)
+        denominator = getSummationLayerDenominator(observation)
+        yHat[idx] = numerator/denominator
+
+    return yHat
+
+# ================================================================================
+
+def calcGradient(orig_sigmas, data, target_y):
+    
+    try:
+        sigmas = np.copy(orig_sigmas).astype(float)
+    
+        num_sigmas = sigmas.shape[0]
+
+        partials = np.zeros(num_sigmas)
+        
+        for i in range(num_sigmas):
+            
+            sigmas[i] *= 1.000001
+            distances = computeDistances(data, sigmas)
+            predictions = makePredictions(distances, target_y)
+            diff = predictions - target_y
+            sigma_diff = sigmas[i] - orig_sigmas[i]
+            partials[i] = (diff/sigma_diff).sum()
+            sigmas[i] = orig_sigmas[i] # reset sigma to orig_sigma value        
+            print partials[i]
+        return partials
+    except:
+        print("Error calculating gradient")
+        exit(0)
+# ================================================================================
 # y - is y a vector or single value?
 # you convert out to a float twice (reason?)
 # R: "y" is meant to be a vector in this context, this code was part of another function previously
@@ -212,6 +251,8 @@ def main():
         yHat.append(numerator/denominator)
         print("{}\t{:.04}\t{:.04}".format(idx, target_y[idx], yHat[idx]))
 
+    print makePredictions(distances, target_y)
+    print calcGradient(sigmas, data, target_y)    
     #numerator   = getSummationLayerNumerator(target_y, distances)
     #denominator = getSummationLayerDenominator(distances)
 
@@ -276,6 +317,10 @@ def main():
 # ================================================================================
 if __name__ == '__main__':
   main();
+
+
+
+
 
 
 
