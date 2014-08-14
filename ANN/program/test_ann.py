@@ -1,9 +1,12 @@
 from ANN import ANN
-import csv
 import time
 from numpy import *
-from pybrain.tools.validation import Validator
 import FromDataFileMLR_DE_BPSO as fdf
+
+from pycallgraph import PyCallGraph
+from pycallgraph import Config
+from pycallgraph import GlobbingFilter
+from pycallgraph.output import GraphvizOutput
 
 def r2(y, yHat):
     """Coefficient of determination"""
@@ -23,31 +26,35 @@ def ccc(y, yHat):
     ccc = numer/denom
     return ccc
 
-TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = fdf.getAllOfTheData()
+config = Config()
+config.trace_filter = GlobbingFilter(exclude=[
+        'pycallgraph.*',
+    ])
+    
+graphviz = GraphvizOutput(output_file='filter_exclude.png')
+with PyCallGraph(output=graphviz, config=config):
+    
+    TrainX, TrainY, ValidateX, ValidateY, TestX, TestY = fdf.getAllOfTheData()
+    TrainX, ValidateX, TestX = fdf.rescaleTheData(TrainX, ValidateX, TestX)
 
-# combine test and training sets
-# Backprop trainer will split it up
-# TrainValX = append(TrainX, ValidateX, axis=0)
-# TrainValY = append(TrainY, ValidateY, axis=0)
+    ann = ANN()
 
-# rescale data
-TrainX, ValidateX, TestX = fdf.rescaleTheData(TrainX, ValidateX, TestX)
-# TrainValX, TrainValY, TestX, TestY = rescaleTheData(TrainValX, TrainValY, TestX, TestY)
+    ann.create_network(TrainX.shape[1], 20, 1)
 
-ann = ANN()
+    train_errors, val_errors = ann.train(TrainX, TrainY, ValidateX, ValidateY)
 
-ann.create_network(TrainX.shape[1], 20, 1)
+    predictions = ann.predict(TestX)
 
-train_errors, val_errors = ann.train(TrainX, TrainY, ValidateX, ValidateY)
-# ann.train(TrainValX, TrainValY)
+    for i in range(TestX.shape[0]):
+        print predictions[i], TestY[i]
+    
+    print "MSE: {}".format(rmse(predictions, TestY))
+    print "Corr: {}".format(ccc(TestY, predictions))
+    print "R2: {}".format(r2(TestY, predictions))
 
-predictions = ann.predict(TestX)
-
-for i in range(TestX.shape[0]):
-    print predictions[i], TestY[i]
-print "MSE: {}".format(rmse(predictions, TestY))
-print "Corr: {}".format(ccc(TestY, predictions))
-print "R2: {}".format(r2(TestY, predictions))
+#fig, ax = plt.subplot(111)
+#ax.plot(train_error)
+#ax.plot(val_error)
 
 # test_outputs = zeros(TrainValX.shape[0])
 # for j in range(TrainValX.shape[0]):
