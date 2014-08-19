@@ -20,11 +20,6 @@ from qsarHelpers import *
 #      about 95% of this time is spent in cv_predict
 #      seems like we should be able to use CUDA for parallel programming
 
-#Question: pyBrain trainUntilConvergence trains until validation error starts to rise
-#          For cv_predict, is this a problem?
-#          Should training not depend on validation data?
-#          I am still thinking about this
-
 #------------------------------------------------------------------------------
 
 def r2(y, yHat):
