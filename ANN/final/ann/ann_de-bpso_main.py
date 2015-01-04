@@ -14,11 +14,10 @@ import FromFitnessFile_ANN_DE_BPSO
 # 1) why not use numpy copy?
 # 2) should velocity be updated before entering iterateNTimes()?
 
-#------------------------------------------------------
-def getTwoDecPoint(x):
-    return float("%.2f"%x)
-
-#------------------------------------------------------
+'''
+* Purpose: create file to hold results
+* Return: file created
+'''
 def createAnOutputFile():
     try:
         file_name = None
@@ -43,50 +42,68 @@ def createAnOutputFile():
         return fileW;
     except:
         print "error creting outout file"
-#------------------------------------------------------------------------------
 
-# calculate fitness of a new potential individual
-
-def findFitnessOfARow(model, vector, TrainX, TrainY, ValidateX, ValidateY):
+'''
+* Purpose: calculate fitness of an individual
+* @param: model - model used for prediction
+* @param: features - vector of features selected and not selected
+* @param: TrainX - training set data
+* @param: TrainY - training set target values
+* @param: ValidateX - validation set data
+* @param: ValidateY - validation set target values
+* @return: fitness (how well individual makes predictions)
+'''
+def findFitnessOfARow(model, features, TrainX, TrainY, ValidateX, ValidateY):
  
-    xi = FromFitnessFile_ANN_DE_BPSO.OnlySelectTheOnesColumns(vector)
+    # select indexes of selected features
+    xi = FromFitnessFile_ANN_DE_BPSO.OnlySelectTheOnesColumns(features)
 
-    # select features from samples
+    # select features from samples (using indexe of selected features)
     X_train_masked = TrainX.T[xi].T
     X_validation_masked = ValidateX.T[xi].T
 
-    # create network to fit new set of features (possible diff number of inputs)
+    # create neural network to fit new set of features
     model.create_network(X_train_masked.shape[1])
 
     # train new model
     try:
+        # train model using selected data features (return name of model used)
         model_desc = model.train(X_train_masked, TrainY, X_validation_masked, ValidateY)
     except:
         print "Error training in findFitnessOfARow"
 
-    # MARK: cv
-    #Yhat_cv = FromFitnessFile_ANN_DE_BPSO.cv_predict(X_train_masked, TrainY, X_validation_masked, ValidateY, model)
+    # uncomment for cross validation
+    #Yhat_cv = FromFitnessFile_ANN_DE_BPSO.cv_predict(X_train_masked, TrainY,
+    #                                                 X_validation_masked, ValidateY, model)
     Yhat_train      = model.predict(X_train_masked)
     Yhat_validation = model.predict(X_validation_masked)
 
     Y_fitness = append(TrainY, ValidateY)
-    #Yhat_fitness = append(Yhat_cv, Yhat_validation) # MARK: cv, would need Yhat_Train instead of Yhat_cv
-    Yhat_fitness = append(Yhat_train, Yhat_validation) # MARK: cv, would need Yhat_Train instead of Yhat_cv
+    Yhat_fitness = append(Yhat_train, Yhat_validation) # for cross validation, use Yhat_cv instead of Yhat_Train
     fitness = FromFitnessFile_ANN_DE_BPSO.calc_fitness(xi, Y_fitness, Yhat_fitness, c=2)
 
     return fitness
-#------------------------------------------------------------------------------
-def equal(V1, V2):
-   numOfFea = V1.shape[0]
-   true = 1
-   false = 0
-   for i in range(numOfFea):
-       if (V1[i] != V2[i]):
-           return false
-   return true
 
-#------------------------------------------------------
-def theRowIsUniqueInPop(RowI,V, population):
+'''
+* Purpose: are two vectors the same? (could also use np.array_equal(v1, v2)
+'''
+def equal(V1, V2):
+  
+   if (V1.shape[0] != V2.shape[0]): # same number of features?
+       return 0
+
+   for i in range(V1.shape[0]):
+       if (V1[i] != V2[i]): # if not the same, return false
+           return 0
+   return 1 # all the same
+
+'''
+Purpose: makes sure a row is not already in population
+* @param: RowI - check rows in population up to this row number
+* @param: population - population matrix with rows to check
+* @param: - vector of values (compare against population row values)
+'''
+def theRowIsUniqueInPop(RowI, V, population):
 
     unique = 1
     # compae V to each individual before it
@@ -96,9 +113,13 @@ def theRowIsUniqueInPop(RowI,V, population):
     
     return unique
 
-#------------------------------------------------------------------------------
+'''
+Purpose: determine which features to select (1) and not to select (0)
+* @param: population
+* @param: epsilon - min percentages of features that must be selected
+'''
 def getAValidRow(population, epsilon=0.015):
-    numOfFea = population.shape[1]
+    numOfFea = population.shape[1] # number of features (columns)
     V = zeros(numOfFea)
     sum = 0;
     #The following ensure that at least couple of features are

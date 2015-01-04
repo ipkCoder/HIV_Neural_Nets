@@ -338,6 +338,7 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
                 if error:
                     return unfit, fitness
             ''' 
+            # uncomment to use cross-validation
             # Computed cross validation predictions MARK: cv
             try:
                 with Timer() as t0:
