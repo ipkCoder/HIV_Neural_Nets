@@ -1,18 +1,10 @@
 import time                 # provides timing for benchmarks
-from numpy   import *        # provides complex math and array functions
-#from sklearn import svm        # provides Support Vector Regression
+from numpy import *         # provides complex math and array functions
 import csv
 import math
 import sys
 import hashlib
 from qsarHelpers import *
-
-# TODO: review evaluation formulas
-#         - need to document
-#         - names?
-#         - what are they?
-#         - understand what they mean
-#         - appropriate for non-linear models?
 
 #TODO: most of the time dealing with population is spent in cv_predict
 #      have to train number of models (one without each sample)
@@ -20,54 +12,43 @@ from qsarHelpers import *
 #      about 95% of this time is spent in cv_predict
 #      seems like we should be able to use CUDA for parallel programming
 
-#------------------------------------------------------------------------------
-
+'''
+Purpose: compute coefficient of determination (how well does model predict?)
+* @param: y (array) - target values
+* @param: yHat (array) - predicted target values
+* @return: coefficient of determination
+'''
 def r2(y, yHat):
+    
     """Coefficient of determination"""
 
-    numer = ((y - yHat)**2).sum()       # Residual Sum of Squares
-    denom = ((y - y.mean())**2).sum()   # total variation in y
+    numer = ((y - yHat)**2).sum()       # variation between predicted and actual targets
+    denom = ((y - y.mean())**2).sum()   # total variation in target values
     r2 = 1 - numer/denom                # all variation (minus) variation not described by model
     return r2                           # variation described by model
                                         #   - if 1, all variation described by model,
                                         #     model would be perfect fit
-                                        #   - if 0, model can't explain any variation
-                                        #   - in y values
-#------------------------------------------------------------------------------
+                                        #   - if 0, model can't explain any variation in y values
 
+'''
+Purpose: TODO (not sure why use this over r2 function above)
+'''
 def r2Pred(yTrain, yTest, yHatTest):
 
     numer = ((yHatTest - yTest)**2).sum()
-    denom = ((yTest - yTrain.mean())**2).sum()      # why this way?
+    denom = ((yTest - yTrain.mean())**2).sum()
     r2Pred = 1 - numer/denom
     return r2Pred
 
-#------------------------------------------------------------------------------
 
-def see(p, y, yHat):
-    """
-    Standard error of estimate
-    (Root mean square error)
-    """
-    n = y.shape[0]
-    numer = ((y - yHat)**2).sum()
-    denom = n - p - 1
-    if (denom == 0):
-        s = 0
-    elif ( (numer/denom) < 0 ):
-        s = 0.001
-    else:
-        s = (numer/denom)** 0.5
-    return s
-#------------------------------------------------------------------------------
-
-# Purpose - compute standard deviation of predictions
-
+'''
+Purpose: compute root mean square error (RMSE) of predictions
+* @param: y (array) - target values
+* @param: yHat (array) - predicted target values
+* @return: RMSE
+'''
 def sdep(y, yHat):
-    """
-    Standard deviation of error of prediction
-    (Root mean square error of prediction)
-    """
+    
     n = y.shape[0]
 
     numer = ((y - yHat)**2).sum()
@@ -75,119 +56,6 @@ def sdep(y, yHat):
     sdep = (numer/n)**0.5  # square root
 
     return sdep
-#------------------------------------------------------------------------------
-
-
-# def ccc(y, yHat):
-#     """Concordance Correlation Coefficient"""
-#     n = y.shape[0]
-#     numer = 2*(((y - y.mean())*(yHat - yHat.mean())).sum())
-#     denom = ((y - y.mean())**2).sum() + ((yHat - yHat.mean())**2).sum() + n*((y.mean() - yHat.mean())**2)
-#     ccc = numer/denom
-#     return ccc
-
-#------------------------------------------------------------------------------
-
-# def ccc_adj(ccc, n, p):
-
-#     """
-#     Adjusted CCC
-#     Parameters
-#     ----------
-#     n : int -- Sample size
-#     p : int -- Number of parameters
-    
-#     """
-#     ccc_adj = ((n - 1)*ccc - p)/(n - p - 1)
-#     return ccc_adj
-
-#------------------------------------------------------------------------------
-
-# def q2F3(yTrain, yTest, yHatTest):
-#     numer = (((yTest - yHatTest)**2).sum())/yTest.shape[0]
-#     denom = (((yTrain - yTrain.mean())**2).sum())/yTrain.shape[0]
-#     q2F3 = 1 - numer/denom
-#     return q2F3
-#------------------------------------------------------------------------------
-
-# def k(y, yHat):
-#     """Compute slopes"""
-#     k = ((y*yHat).sum())/((yHat**2).sum())
-#     kP = ((y*yHat).sum())/((y**2).sum())
-#     return k, kP
-
-#------------------------------------------------------------------------------
-
-# def r0(y, yHat, k, kP):
-#     """
-#     Compute correlation for regression lines through the origin
-#     Parameters
-#     ----------
-#     k  : float -- Slope
-#     kP : float -- Slope
-    
-#     """
-#     numer = ((yHat - k*yHat)**2).sum()
-#     denom = ((yHat - yHat.mean())**2).sum()
-#     r2_0 = 1 - numer/denom
-#     numer = ((y - kP*y)**2).sum()
-#     denom = ((y - y.mean())**2).sum()
-#     rP2_0 = 1 - numer/denom
-#     return r2_0, rP2_0
-
-#------------------------------------------------------------------------------
-
-# def r2m(r2, r20):
-#     """Roy Validation Metrics"""
-#     r2m = r2*(1 - (r2 - r20)**0.5)
-#     return r2m
-
-# #------------------------------------------------------------------------------
-
-# def r2m_adj(r2m, n, p):
-
-#     """
-#     Adjusted r2m 
-#     Parameters
-#     ----------
-#     n : int -- Number of observations
-#     p : int -- Number of predictor variables
-    
-#     """
-#     r2m_adj = ((n - 1)*r2m - p)/(n - p - 1)
-#     return r2m_adj
-
-#------------------------------------------------------------------------------
-
-# def r2p(r2, r2r):
-#     """
-#     Parameters
-#     ----------
-#     r2r : float --Average r^2 of y-randomized models.
-    
-#     """
-#     r2p = r2*((r2 - r2r)**0.5)
-#     return r2p
-
-#------------------------------------------------------------------------------
-
-def rmse(X, Y):
-    """
-    Calculate the root-mean-square error (RMSE) also known as root mean
-    square deviation (RMSD).
-    
-    Parameters
-    ----------
-    X : array_like -- Assumed to be 1D.
-    Y : array_like -- Assumed to be the same shape as X.
-    
-    Returns
-    -------
-    out : float64
-    """
-    X = asarray(X, dtype=float64)
-    Y = asarray(Y, dtype=float64)
-    return (sum((X-Y)**2)/len(X))**.5
 
 """
 Purpose: - cross validate training data
@@ -255,7 +123,7 @@ def calc_fitness(selected_features, Y, Yhat, c=2):
     return fitness
 
 '''
-Purpose: initialize dictionaries to hold information
+Purpose: initialize dictionaries to hold result information
 '''
 def InitializeTracks():
     trackDesc = {}
@@ -287,7 +155,9 @@ def initializeYDimension():
     return yTrain, yHatTrain, yHatCV, yValidation, yHatValidation, yTest, yHatTest 
 
 '''
-Purpose: return indexes of nonzero values in array
+Purpose: select indexes of nonzero elements (features selected by individual)
+* @param: individual (array) - member of population
+* @return: indexes of nonzero values in individual's array
 '''
 def OnlySelectTheOnesColumns(popI):
     
@@ -297,7 +167,7 @@ def OnlySelectTheOnesColumns(popI):
     return indicies_of_non_zeros
 
 '''
-Purpose:
+Purpose: TODO
 '''
 def validate_model(generation, model, fileW, population, TrainX, TrainY,\
                    ValidateX, ValidateY, TestX, TestY):
@@ -438,4 +308,136 @@ def write(fileW, model, generation, individual, trackDesc, trackIdx, trackFitnes
         trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
         trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain,  \
         yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams])
+
+#----------------------- Functions not being used ------------------------------
+
+# def see(p, y, yHat):
+#     """
+#     Standard error of estimate
+#     (Root mean square error)
+#     """
+#     n = y.shape[0]
+#     numer = ((y - yHat)**2).sum()
+#     denom = n - p - 1
+#     if (denom == 0):
+#         s = 0
+#     elif ( (numer/denom) < 0 ):
+#         s = 0.001
+#     else:
+#         s = (numer/denom)** 0.5
+#     return s
+
+#------------------------------------------------------------------------------
+
+
+# def ccc(y, yHat):
+#     """Concordance Correlation Coefficient"""
+#     n = y.shape[0]
+#     numer = 2*(((y - y.mean())*(yHat - yHat.mean())).sum())
+#     denom = ((y - y.mean())**2).sum() + ((yHat - yHat.mean())**2).sum() + n*((y.mean() - yHat.mean())**2)
+#     ccc = numer/denom
+#     return ccc
+
+#------------------------------------------------------------------------------
+
+# def ccc_adj(ccc, n, p):
+
+#     """
+#     Adjusted CCC
+#     Parameters
+#     ----------
+#     n : int -- Sample size
+#     p : int -- Number of parameters
+    
+#     """
+#     ccc_adj = ((n - 1)*ccc - p)/(n - p - 1)
+#     return ccc_adj
+
+#------------------------------------------------------------------------------
+
+# def q2F3(yTrain, yTest, yHatTest):
+#     numer = (((yTest - yHatTest)**2).sum())/yTest.shape[0]
+#     denom = (((yTrain - yTrain.mean())**2).sum())/yTrain.shape[0]
+#     q2F3 = 1 - numer/denom
+#     return q2F3
+#------------------------------------------------------------------------------
+
+# def k(y, yHat):
+#     """Compute slopes"""
+#     k = ((y*yHat).sum())/((yHat**2).sum())
+#     kP = ((y*yHat).sum())/((y**2).sum())
+#     return k, kP
+
+#------------------------------------------------------------------------------
+
+# def r0(y, yHat, k, kP):
+#     """
+#     Compute correlation for regression lines through the origin
+#     Parameters
+#     ----------
+#     k  : float -- Slope
+#     kP : float -- Slope
+    
+#     """
+#     numer = ((yHat - k*yHat)**2).sum()
+#     denom = ((yHat - yHat.mean())**2).sum()
+#     r2_0 = 1 - numer/denom
+#     numer = ((y - kP*y)**2).sum()
+#     denom = ((y - y.mean())**2).sum()
+#     rP2_0 = 1 - numer/denom
+#     return r2_0, rP2_0
+
+#------------------------------------------------------------------------------
+
+# def r2m(r2, r20):
+#     """Roy Validation Metrics"""
+#     r2m = r2*(1 - (r2 - r20)**0.5)
+#     return r2m
+
+# #------------------------------------------------------------------------------
+
+# def r2m_adj(r2m, n, p):
+
+#     """
+#     Adjusted r2m 
+#     Parameters
+#     ----------
+#     n : int -- Number of observations
+#     p : int -- Number of predictor variables
+    
+#     """
+#     r2m_adj = ((n - 1)*r2m - p)/(n - p - 1)
+#     return r2m_adj
+
+#------------------------------------------------------------------------------
+
+# def r2p(r2, r2r):
+#     """
+#     Parameters
+#     ----------
+#     r2r : float --Average r^2 of y-randomized models.
+    
+#     """
+#     r2p = r2*((r2 - r2r)**0.5)
+#     return r2p
+
+#------------------------------------------------------------------------------
+
+# def rmse(X, Y):
+#     """
+#     Calculate the root-mean-square error (RMSE) also known as root mean
+#     square deviation (RMSD).
+    
+#     Parameters
+#     ----------
+#     X : array_like -- Assumed to be 1D.
+#     Y : array_like -- Assumed to be the same shape as X.
+    
+#     Returns
+#     -------
+#     out : float64
+#     """
+#     X = asarray(X, dtype=float64)
+#     Y = asarray(Y, dtype=float64)
+#     return (sum((X-Y)**2)/len(X))**.5
 
