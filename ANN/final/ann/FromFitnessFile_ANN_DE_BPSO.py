@@ -78,96 +78,96 @@ def sdep(y, yHat):
 #------------------------------------------------------------------------------
 
 
-def ccc(y, yHat):
-    """Concordance Correlation Coefficient"""
-    n = y.shape[0]
-    numer = 2*(((y - y.mean())*(yHat - yHat.mean())).sum())
-    denom = ((y - y.mean())**2).sum() + ((yHat - yHat.mean())**2).sum() + n*((y.mean() - yHat.mean())**2)
-    ccc = numer/denom
-    return ccc
+# def ccc(y, yHat):
+#     """Concordance Correlation Coefficient"""
+#     n = y.shape[0]
+#     numer = 2*(((y - y.mean())*(yHat - yHat.mean())).sum())
+#     denom = ((y - y.mean())**2).sum() + ((yHat - yHat.mean())**2).sum() + n*((y.mean() - yHat.mean())**2)
+#     ccc = numer/denom
+#     return ccc
 
 #------------------------------------------------------------------------------
 
-def ccc_adj(ccc, n, p):
+# def ccc_adj(ccc, n, p):
 
-    """
-    Adjusted CCC
-    Parameters
-    ----------
-    n : int -- Sample size
-    p : int -- Number of parameters
+#     """
+#     Adjusted CCC
+#     Parameters
+#     ----------
+#     n : int -- Sample size
+#     p : int -- Number of parameters
     
-    """
-    ccc_adj = ((n - 1)*ccc - p)/(n - p - 1)
-    return ccc_adj
+#     """
+#     ccc_adj = ((n - 1)*ccc - p)/(n - p - 1)
+#     return ccc_adj
 
 #------------------------------------------------------------------------------
 
-def q2F3(yTrain, yTest, yHatTest):
-    numer = (((yTest - yHatTest)**2).sum())/yTest.shape[0]
-    denom = (((yTrain - yTrain.mean())**2).sum())/yTrain.shape[0]
-    q2F3 = 1 - numer/denom
-    return q2F3
+# def q2F3(yTrain, yTest, yHatTest):
+#     numer = (((yTest - yHatTest)**2).sum())/yTest.shape[0]
+#     denom = (((yTrain - yTrain.mean())**2).sum())/yTrain.shape[0]
+#     q2F3 = 1 - numer/denom
+#     return q2F3
 #------------------------------------------------------------------------------
 
-def k(y, yHat):
-    """Compute slopes"""
-    k = ((y*yHat).sum())/((yHat**2).sum())
-    kP = ((y*yHat).sum())/((y**2).sum())
-    return k, kP
+# def k(y, yHat):
+#     """Compute slopes"""
+#     k = ((y*yHat).sum())/((yHat**2).sum())
+#     kP = ((y*yHat).sum())/((y**2).sum())
+#     return k, kP
 
 #------------------------------------------------------------------------------
 
-def r0(y, yHat, k, kP):
-    """
-    Compute correlation for regression lines through the origin
-    Parameters
-    ----------
-    k  : float -- Slope
-    kP : float -- Slope
+# def r0(y, yHat, k, kP):
+#     """
+#     Compute correlation for regression lines through the origin
+#     Parameters
+#     ----------
+#     k  : float -- Slope
+#     kP : float -- Slope
     
-    """
-    numer = ((yHat - k*yHat)**2).sum()
-    denom = ((yHat - yHat.mean())**2).sum()
-    r2_0 = 1 - numer/denom
-    numer = ((y - kP*y)**2).sum()
-    denom = ((y - y.mean())**2).sum()
-    rP2_0 = 1 - numer/denom
-    return r2_0, rP2_0
+#     """
+#     numer = ((yHat - k*yHat)**2).sum()
+#     denom = ((yHat - yHat.mean())**2).sum()
+#     r2_0 = 1 - numer/denom
+#     numer = ((y - kP*y)**2).sum()
+#     denom = ((y - y.mean())**2).sum()
+#     rP2_0 = 1 - numer/denom
+#     return r2_0, rP2_0
 
 #------------------------------------------------------------------------------
 
-def r2m(r2, r20):
-    """Roy Validation Metrics"""
-    r2m = r2*(1 - (r2 - r20)**0.5)
-    return r2m
+# def r2m(r2, r20):
+#     """Roy Validation Metrics"""
+#     r2m = r2*(1 - (r2 - r20)**0.5)
+#     return r2m
 
-#------------------------------------------------------------------------------
+# #------------------------------------------------------------------------------
 
-def r2m_adj(r2m, n, p):
+# def r2m_adj(r2m, n, p):
 
-    """
-    Adjusted r2m 
-    Parameters
-    ----------
-    n : int -- Number of observations
-    p : int -- Number of predictor variables
+#     """
+#     Adjusted r2m 
+#     Parameters
+#     ----------
+#     n : int -- Number of observations
+#     p : int -- Number of predictor variables
     
-    """
-    r2m_adj = ((n - 1)*r2m - p)/(n - p - 1)
-    return r2m_adj
+#     """
+#     r2m_adj = ((n - 1)*r2m - p)/(n - p - 1)
+#     return r2m_adj
 
 #------------------------------------------------------------------------------
 
-def r2p(r2, r2r):
-    """
-    Parameters
-    ----------
-    r2r : float --Average r^2 of y-randomized models.
+# def r2p(r2, r2r):
+#     """
+#     Parameters
+#     ----------
+#     r2r : float --Average r^2 of y-randomized models.
     
-    """
-    r2p = r2*((r2 - r2r)**0.5)
-    return r2p
+#     """
+#     r2p = r2*((r2 - r2r)**0.5)
+#     return r2p
 
 #------------------------------------------------------------------------------
 
@@ -188,23 +188,23 @@ def rmse(X, Y):
     X = asarray(X, dtype=float64)
     Y = asarray(Y, dtype=float64)
     return (sum((X-Y)**2)/len(X))**.5
-#------------------------------------------------------------------------------
+
 """
-    Purpose: - cross validate training data
-             - for each sample, train model without that sample, then predict target for that sample
-    
-    @param set_x: feature set for training set data
-    @param set_y: target values for training set data
-    @param val_x: feature set for validation set data
-    @param val_y: target values for validation set data
+Purpose: - cross validate training data
+         - for each sample, train model without that sample, then predict target for that sample
 
-    @variable yhat: array to hold predicted values for each training sample (size same as set_x)
-    @variable train_x: training set without sample to predict
-    @variable train_y: target values for training set without target value for sample to predict
-    @variable model_name: name of model used to predict values
-    @variable idx: index of sample/target value to drop from set_x/set_y
+@param set_x: feature set for training set data
+@param set_y: target values for training set data
+@param val_x: feature set for validation set data
+@param val_y: target values for validation set data
 
-    note: val_x and val_y are used in training model because pyBrain requires validation data
+@variable yhat: array to hold predicted values for each training sample (size same as set_x)
+@variable train_x: training set without sample to predict
+@variable train_y: target values for training set without target value for sample to predict
+@variable model_name: name of model used to predict values
+@variable idx: index of sample/target value to drop from set_x/set_y
+
+note: val_x and val_y are used in training model because pyBrain requires validation data
 """
 
 def cv_predict(set_x, set_y, val_x, val_y, model):
@@ -226,34 +226,37 @@ def cv_predict(set_x, set_y, val_x, val_y, model):
         #finally:
             #print("Trained cv individual {} in cv_predict: {:.03f} sec.".format( idx,t.interval))
     return yhat
-#------------------------------------------------------------------------------
-#Ahmad Hadaegh: Modified  on: July 16, 2013
-def calc_fitness(xi, Y, Yhat, c=2):
-    """
-    Calculate fitness of a prediction.
-    Parameters
-    ----------
-    xi : array_like -- Mask of features to measure fitness of. Must be of dtype bool.
-    model : object  --  Object to make predictions, usually a regression model object.
-    c : float       -- Adjustment parameter.
-    
-    Returns
-    -------
-    out: float -- Fitness for the given data.
-    
-    """
 
-    p     = len(xi);
-    n     = len(Y)    # Sample size
-    numer = ((Y - Yhat)**2).sum()/n   # Mean square error
-    pcn   = p*(c/n)
-    if pcn >= 1:
+
+"""
+Purpose: calculate fitness of a prediction.
+* @param: xi (array) - indexes of selected features
+* @param: Y (array) - target values (y)
+* @param: Yhat (array) - predicted target values
+* @param: c (float) - adjustment parameter.
+* @return: fitness (float) - fitness for the given data (from individual)
+"""
+def calc_fitness(selected_features, Y, Yhat, c=2):
+
+    features_count  = len(selected_features);
+    sample_size     = len(Y)
+
+    mean_squared_error = ((Y - Yhat)**2).sum()/sample_size
+    
+    pcn   = features_count*(c/sample_size)
+    
+    if pcn >= 1: # too many features
         return 1000
+
     denom = (1 - pcn)**2
-    theFitness = numer/denom
-    return theFitness
-#------------------------------------------------------------------------------
-#Ahmad Hadaegh: Modified  on: July 16, 2013
+    
+    fitness = mean_squared_error/denom
+    
+    return fitness
+
+'''
+Purpose: initialize dictionaries to hold information
+'''
 def InitializeTracks():
     trackDesc = {}
     trackIdx = {}
@@ -269,8 +272,10 @@ def InitializeTracks():
     return  trackDesc, trackIdx, trackFitness, trackModel, trackR2, trackQ2, \
             trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
             trackSDEPValidation, trackSDEPTest
-#------------------------------------------------------------------------------
-#Ahmad Hadaegh: Modified  on: July 16, 2013
+
+'''
+Purpose: initialize dictionaries to hold tagert (y) information
+'''
 def initializeYDimension():
     yTrain = {}
     yHatTrain = {}
@@ -280,7 +285,10 @@ def initializeYDimension():
     yTest = {}
     yHatTest = {}
     return yTrain, yHatTrain, yHatCV, yValidation, yHatValidation, yTest, yHatTest 
-#------------------------------------------------------------------------------
+
+'''
+Purpose: return indexes of nonzero values in array
+'''
 def OnlySelectTheOnesColumns(popI):
     
     indicies_of_non_zeros = popI.nonzero()[0]
@@ -288,10 +296,12 @@ def OnlySelectTheOnesColumns(popI):
 
     return indicies_of_non_zeros
 
-#------------------------------------------------------------------------------
-#Ahmad Hadaegh: Modified  on: July 16, 2013
+'''
+Purpose:
+'''
 def validate_model(generation, model, fileW, population, TrainX, TrainY,\
                    ValidateX, ValidateY, TestX, TestY):
+    
     numOfPop   = population.shape[0]
     fitness    = zeros(numOfPop)
     c          = 2
@@ -304,8 +314,7 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
     trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
     trackSDEPValidation, trackSDEPTest = InitializeTracks()
     
-    yTrain, yHatTrain, yHatCV, yValidation, \
-    yHatValidation, yTest, yHatTest    = initializeYDimension()
+    yTrain, yHatTrain, yHatCV, yValidation, yHatValidation, yTest, yHatTest    = initializeYDimension()
     
     unfit                              = 1000
     itFits                             = 1
@@ -354,19 +363,19 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             # Compute statistics for the coefficient of determination (R2)
             # i.e. Prediction for Validation and Test set
             r2_train          = r2(TrainY, Yhat_train)
-       #---     q2_loo            = r2(TrainY, Yhat_cv)                              # MARK: cv
+            #q2_loo            = r2(TrainY, Yhat_cv)                              # uncomment for cross validation
             r2pred_validation = r2Pred(TrainY, ValidateY, Yhat_validation)
             r2pred_test       = r2Pred(TrainY, TestY, Yhat_test)
             
             # calculate fitness, use training and validation prediction/target values
-            Y_fitness         = append(TrainY, ValidateY)
-	    #Y_fitness         = append(Y_fitness, TestY)
-	    Y_fitness         = append(Y_fitness, TestY)
-       #---     Yhat_fitness      = append(Yhat_cv, Yhat_validation)               # MARK: cv
+            Y_fitness         = append(TrainY, ValidateY) # combine train and validate targets
+	        Y_fitness         = append(Y_fitness, TestY)  # also add test targets
+
+            #Yhat_fitness      = append(Yhat_cv, Yhat_validation)           # uncomment for cross validation
             Yhat_fitness      = append(Yhat_train, Yhat_validation)
-            #Yhat_fitness      = append(Yhat_fitness, Yhat_test)               # MARK: cv
-            Yhat_fitness      = append(Yhat_fitness, Yhat_test)               # MARK: cv
-	    fitness[i]        = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
+            #Yhat_fitness      = append(Yhat_fitness, Yhat_test)               # uncomment for cross validation
+            Yhat_fitness      = append(Yhat_fitness, Yhat_test)                # uncomment for cross validation
+	        fitness[i]        = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
             
             # ignore and continue if predictive quality is too low
             # between either the training, cross-validation or test sets
@@ -388,7 +397,7 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             trackFitness[idx]          = fitness[i]
             trackModel[idx]            = model_desc
             
-       #---     trackQ2[idx]               = q2_loo             # MARK: cv
+       #---     trackQ2[idx]               = q2_loo               # uncomment for cross validation
             
             trackR2[idx]               = r2_train
             trackR2PredValidation[idx] = r2pred_validation
@@ -400,7 +409,7 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             
             yTrain[idx]                = TrainY.tolist()
             yHatTrain[idx]             = Yhat_train.tolist()
-       #---     yHatCV[idx]                = Yhat_cv.tolist()           # MARK: cv
+       #---     yHatCV[idx]                = Yhat_cv.tolist()      # uncomment for cross validation
             yValidation[idx]           = ValidateY.tolist()
             yHatValidation[idx]        = Yhat_validation.tolist()
             yTest[idx]                 = TestY.tolist()
@@ -410,12 +419,6 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
 
         print "Trained and found results for population {}: {:.03} sec".format(i, t.interval)
 
-        #printing the information into the file MARK: cv
-        '''write(fileW, trackModel[idx], generation, i, trackDesc[idx], trackIdx[idx], trackFitness[idx],
-            trackR2[idx], trackQ2[idx],trackR2PredValidation[idx], trackR2PredTest[idx], trackSDEPTrain[idx], \
-            trackSDEPValidation[idx], trackSDEPTest[idx], yTrain[idx], yHatTrain[idx], yHatCV[idx], \
-            yValidation[idx], yHatValidation[idx], yTest[idx], yHatTest[idx], inToHiddenParams, inToOutParams)
-        '''
         write(fileW, trackModel[idx], generation, i, trackDesc[idx], trackIdx[idx], trackFitness[idx],
             trackR2[idx],trackR2PredValidation[idx], trackR2PredTest[idx], trackSDEPTrain[idx], \
             trackSDEPValidation[idx], trackSDEPTest[idx], yTrain[idx], yHatTrain[idx], \
@@ -423,31 +426,16 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
     
     return itFits, fitness
 
-#------------------------------------------------------------------------------  
-#------------------------------------------------------------------------------  
-#Ahmad Hadaegh: Modified  on: July 16, 2013 MARK: cv
+'''
+Purpose: write model result information to file
+'''
 def write(fileW, model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
           trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
           trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain,  \
           yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams): 
 
-    # MARK: cv
     fileW.writerow([model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
         trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
         trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain,  \
         yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams])
-    #fileOut.close()
-'''
-#Ahmad Hadaegh: Modified  on: July 16, 2013 MARK: cv
-def write(fileW, model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
-          trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
-          trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
-          yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams): 
 
-    # MARK: cv
-    fileW.writerow([model, generation, individual, trackDesc, trackIdx, trackFitness, trackR2, \
-        trackR2PredValidation, trackR2PredTest, trackSDEPTrain, \
-        trackSDEPValidation,trackSDEPTest,yTrain, yHatTrain, yHatCV, \
-        yValidation, yHatValidation, yTest, yHatTest, inToHiddenParams, inToOutParams])
-    #fileOut.close()
-'''

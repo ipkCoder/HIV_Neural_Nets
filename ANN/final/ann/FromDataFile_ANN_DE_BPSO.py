@@ -1,16 +1,12 @@
-import time                 # provides timing for benchmarks
 from numpy  import *        # provides complex math and array functions
-#from sklearn import svm	    # provides Support Vector Regression
 import csv
 import math
 import sys
 import os
 
-#------------------------------------------------------------------------------
-def getTwoDecPoint(x):
-    return float("%.2f"%x);
-
-#------------------------------------------------------------------------------
+'''
+Purpose: load data into array
+'''
 def placeDataIntoArray(fileName):
     try:
         with open(fileName, mode='rbU') as csvfile:
@@ -21,13 +17,12 @@ def placeDataIntoArray(fileName):
             return dataArray.flatten(order='C')
         else:
             return dataArray;
-        # dataArray = genfromtxt(filename, delimiter=',')
-        # print dataArrayann
-        # return dataArray
     except:
         print "error placing data into array for {}.".format(fileName)
         
-#------------------------------------------------------------------------------
+'''
+Purpose: create train, validate, test sets
+'''
 def getAllOfTheData():
     try:
         TrainX    = placeDataIntoArray(os.path.join(os.getcwd(), 'new_data/train_x.csv'))
@@ -40,8 +35,9 @@ def getAllOfTheData():
     except:
         print "error getting all of data"
 
-#------------------------------------------------------------------------------
-
+'''
+Purpose: normalize the feature data
+'''
 def rescaleTheData(TrainX, ValidateX, TestX):
     try:
         # 1 degree of freedom means (ddof) N-1 unbiased estimation
@@ -59,4 +55,3 @@ def rescaleTheData(TrainX, ValidateX, TestX):
     except:
         print "error rescaling the data"
 
-#------------------------------------------------------------------------------
