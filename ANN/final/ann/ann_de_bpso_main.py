@@ -10,8 +10,6 @@ import ANN
 import FromDataFile_ANN_DE_BPSO
 import FromFitnessFile_ANN_DE_BPSO
 
-# 1) why not use numpy copy?
-
 '''
 * Purpose: create file to hold results
 * Return: file created
@@ -197,7 +195,7 @@ def findFitnessOfARow(model, features, TrainX, TrainY, ValidateX, ValidateY):
 * Purpose: are two vectors the same? (could also use np.array_equal(v1, v2)
 '''
 def equal(V1, V2):
-  
+
    if (V1.shape[0] != V2.shape[0]): # same number of features?
        return 0
 
@@ -223,45 +221,37 @@ def theRowIsUniqueInPop(RowI, V, population):
     return unique
 
 '''
-Purpose: TODO
+Purpose: find the global best fitness and individual
 * @param: population - population matrix
 * @param: fitness - vector of individual fitnesses in population
 * @param: globalBestRow - individual that produced best fitness over all generations
 * @param: globalBestFitness - best fitness found so far over all generations
-* @param: TODO
+* @return: global best fitness and individual
 '''
 def findGlobalBest(population, fitness, globalBestRow, globalBestFitness):
     try:
         numOfPop = population.shape[0]
         numOfFea = population.shape[1]
         
-        min = argmin(fitness)
-        
-#        k = -1
-#        min = fitness[0]
-#        # find min fitness and corresponding population row index (k)
-#        for i in range(numOfPop):
-#            if (fitness[i] < min):
-#                min = fitness[i]
-#                k = i
+        min = argmin(fitness) # index of min fitness
 
         # get global best fitness and row
         if (fitness[min] < globalBestFitness):
             globalBestFitness = fitness[min]
             for j in range(numOfFea):
-                globalBestRow[j] = population[k][j]
+                globalBestRow[j] = population[min][j]
                 
         return globalBestRow, globalBestFitness;
     except:
         print "error finding global best";
 
 '''
-Purpose: TODO
-* @param: population - matrix of individuals (vectors)
-* @param: fitness - vector of individual fitnesses in population
-* @param: localBestFitness - TODO
-* @param: localBestMatrix - TODO
-* @param: TODO
+Purpose: find local best fitness and matrix (population)
+* @param: population (matrix) - matrix of individuals (vectors)
+* @param: fitness (array)- vector of individual fitnesses in population
+* @param: localBestFitness (array) - best fitness of each line of descendents (index in population)
+* @param: localBestMatrix (matrix) - population of best individual in each line of descendents
+* @param: local bes fitness and matrix
 '''
 def findLocalBestMatrix (population, fitness, localBestFitness, localBestMatrix):
   
@@ -282,12 +272,12 @@ def findLocalBestMatrix (population, fitness, localBestFitness, localBestMatrix)
 
 '''
 Purpose: update velocity of an individual used to update individual's position in feature space
-* @param: velocity - TODO
+* @param: velocity - how fast to move individuals
 * @param: population - matrix of individuals (vectors)
-* @param: localBestMatrix - TODO
+* @param: localBestMatrix (matrix) - population of best individual in each line of descendents
 * @param: globalBestRow - individual that produced best fitness over all generations
 * @param: globalBestFitness - best fitness found so far over all generations
-* @param: TODO
+* @param: updated velocity
 '''
 def findVelocity(velocity, population, localBestMatrix, globalBestRow, globalBestFitness):
   
@@ -320,15 +310,15 @@ def rowExistInParentPop(row, parentPop):
     return 0
 
 '''
-Purpose: TODO
-* @param: P
-* @param: V
-* @param: model
+Purpose: create new individual from an individual and provisional individual (additional mutation)
+* @param: P - individual to change
+* @param: V - provisional individual mutated from individuals in population
+* @param: model - model used for prediction
 * @param: TrainX - training set data
 * @param: TrainY - training set target values
 * @param: ValidateX - validation set data
 * @param: ValidateY - validation set target values
-* @return: TODO
+* @return: new individual
 '''
 def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
   
@@ -347,23 +337,21 @@ def crossover(P, V, model, TrainX, TrainY, ValidateX, ValidateY ):
     fitnessU = findFitnessOfARow(model, U, TrainX, TrainY, ValidateX, ValidateY)
     fitnessV = findFitnessOfARow(model, V, TrainX, TrainY, ValidateX, ValidateY)
     
-    if (fitnessU < fitnessV):
+    if (fitnessU < fitnessV): # pick better mutation
         return U, fitnessU
     else:
         return V, fitnessV 
-#------------- DE/rand/1 -------------------------------
+
 '''
-Purpose: TODO
-* @param:
-* @param:
-* @param:
-* @param:
-* @return: TODO
+Purpose: (DE/rand/1) Creates a mutant variant feature descriptor row vector 
+         from a set of three mutually distinct candidate row vectors.
+* @param: V1 - row vector one
+* @param: V2 - row vector two
+* @param: V3 - row vector three
+* @param: F - controls the length of the exploration vector (V2 - V1)
+* @return: mutant individual
 '''
 def mutate(V1, V2, V3, F = 0.5):
-    '''Creates a mutant variant feature descriptor 
-    row vector from a set of three mutually distinct 
-    candidate row vectors.'''
     numOfFea = V1.shape[0]
     # it is a common value when we do DE algorithm.
     # Formally 'F' is defined as the differential weight,
@@ -416,8 +404,9 @@ def selectThreeRandomRows(parentPop):
     return V1, V2, V3;
 
 '''
-Purpose: TODO
-* @param:
+Purpose: find new individual for next generation
+* @param: rowI - individual index in population to mutate
+* @param: parentPop - population being modified
 * @param: fitness - vector of individual fitnesses in population
 * @param: model - model used for prediction
 * @param: TrainX - training set data
@@ -426,14 +415,8 @@ Purpose: TODO
 * @param: ValidateY - validation set target values
 * @return:
 '''
-# P = individual i from parent population
-# V = new individual created from function of three random individuals
-# U = individual created from P and V, OR V (whichever has better fitness)
-
 def findTheRightVector(rowI, parentPop, fitness, model, TrainX, TrainY, ValidateX, ValidateY):
   
-    '''This is the mutation function'''
-    
     numOfPop = parentPop.shape[0] # why have, not used ???
     numOfFea = parentPop.shape[1]
     P        = zeros(numOfFea)
@@ -441,10 +424,8 @@ def findTheRightVector(rowI, parentPop, fitness, model, TrainX, TrainY, Validate
     fitnessP = fitness[rowI]
     fitnessU = 0
     
-    # P is same as parent row i
+    # individual to mutate
     P = [x for x in parentPop[rowI]]
-#    for j in range(numOfFea):
-#       P[j] = parentPop[rowI][j]
 
     # find new row combination by using mutation function on three randowm rows
     # and using cross over function. If new row has lower/better fitness,  
@@ -457,16 +438,15 @@ def findTheRightVector(rowI, parentPop, fitness, model, TrainX, TrainY, Validate
         # The scaling factor 'F' controls the length of the
         # exploration vector (x_r - x_s)
         provisional  = mutate(V1, V2, V3, F = 0.5)
-        U, fitnessU  = crossover(P, provisional, model,TrainX, TrainY, ValidateX, ValidateY)
+        U, fitnessU  = crossover(P, provisional, model, TrainX, TrainY, ValidateX, ValidateY)
   
-    if (fitnessU < fitnessP):
+    if (fitnessU < fitnessP): #choose better same individual or mutated
         return U
     else:
         return P
 
 '''
-Purpose: copy individual
-TODO - considering replacing with list comprehension
+Purpose: copy individual (array)
 '''
 def getPopulationI(parentPopI):
     numOfFea = parentPopI.shape[0]
@@ -534,7 +514,7 @@ Purpose: create and initialize new population
 * @param: fitness - vector of individual fitnesses in population
 * @param: parentPop - matrix of individuals from previous generation
 * @param: population - matrix of individuals
-* @param: localBestMatrix - TODO
+* @param: localBestMatrix (matrix) - population of best individual in each line of descendents
 * @param: globalBestRow - individual that produced best fitness over all generations
 * @param: TrainX - training set data
 * @param: TrainY - training set target values
@@ -592,7 +572,7 @@ def findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
         # The following ensure that we still have a vector that some of
         # features still have been selected. So zero vector or the ones
         # with less than 1% is not good
-        V = zeros(numOfFea) # TODO - [x for x in population[i]]
+        V = zeros(numOfFea)
         for j in range(numOfFea):
             V[j] = population[i][j]
         
@@ -603,7 +583,7 @@ def findNewPopulation(model, alpha, beta, fitness, velocity, parentPop,\
         while (V.sum() < 3) or (not theRowIsUniqueInPop(i, V, population)) or (rowExistInParentPop(V, parentPop)):
             row = getAValidRow(population)
             for j in range(numOfFea):
-              population[i][j] = row[j] # TODO - population[i] = [x for x in getAValidRow(population)]
+              population[i][j] = row[j]
 
     return population
 
@@ -614,15 +594,7 @@ Purpose: create copy of population
 '''
 def getParentPopulation(population):
     try:
-        return array([[x for x in row] for row in population]) # TODO - double check
-    
-#        numOfPop  = population.shape[0]
-#        numOfFea  = population.shape[1]
-#        parentPop = zeros((numOfPop, numOfFea))
-#        for i in range(numOfPop):
-#            for j in range(numOfFea):
-#                parentPop[i][j]= population[i][j]
-#        return parentPop;
+        return array([[x for x in row] for row in population])
     except:
         print "error getting parent population"
     
@@ -807,4 +779,4 @@ def main():
                   globalBestFitness, TrainX, TrainY, ValidateX, ValidateY, TestX, TestY)
 #------------------------------------------------------    
 # #main program starts in here
-# main()
+main()

@@ -98,7 +98,7 @@ def cv_predict(set_x, set_y, val_x, val_y, model):
 
 """
 Purpose: calculate fitness of a prediction.
-* @param: xi (array) - indexes of selected features
+* @param: selected_features (array) - indexes of selected features
 * @param: Y (array) - target values (y)
 * @param: Yhat (array) - predicted target values
 * @param: c (float) - adjustment parameter.
@@ -167,14 +167,24 @@ def OnlySelectTheOnesColumns(popI):
     return indicies_of_non_zeros
 
 '''
-Purpose: TODO
+Purpose: determine how well model performed and store results
+* @param: generation - current generation number
+* @param: model - model used for prediction
+* @param: fileW - open file to store data
+* @population - set of individuals
+* @param: TrainX - training set data
+* @param: TrainY - training set target values
+* @param: ValidateX - validation set data
+* @param: ValidateY - validation set target values
+* @param: TestX - test set data
+* @param: TestY - test set target values
 '''
 def validate_model(generation, model, fileW, population, TrainX, TrainY,\
                    ValidateX, ValidateY, TestX, TestY):
     
     numOfPop   = population.shape[0]
     fitness    = zeros(numOfPop)
-    c          = 2
+    c          = 2 # adjustment in calc_fitness
     false      = 0
     true       = 1
     predictive = false
@@ -239,13 +249,13 @@ def validate_model(generation, model, fileW, population, TrainX, TrainY,\
             
             # calculate fitness, use training and validation prediction/target values
             Y_fitness         = append(TrainY, ValidateY) # combine train and validate targets
-	        Y_fitness         = append(Y_fitness, TestY)  # also add test targets
+            Y_fitness         = append(Y_fitness, TestY)  # also add test targets
 
             #Yhat_fitness      = append(Yhat_cv, Yhat_validation)           # uncomment for cross validation
             Yhat_fitness      = append(Yhat_train, Yhat_validation)
             #Yhat_fitness      = append(Yhat_fitness, Yhat_test)               # uncomment for cross validation
             Yhat_fitness      = append(Yhat_fitness, Yhat_test)                # uncomment for cross validation
-	        fitness[i]        = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
+            fitness[i]        = calc_fitness(xi, Y_fitness, Yhat_fitness, c)
             
             # ignore and continue if predictive quality is too low
             # between either the training, cross-validation or test sets
